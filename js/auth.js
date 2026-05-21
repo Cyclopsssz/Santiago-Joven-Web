@@ -1,0 +1,273 @@
+import { API_CONFIG } from './api.js';
+import { showStatusMessage } from './utils.js';
+
+export let currentUser = null;
+export let currentUserEmail = null;
+export let userRole = null;
+
+// Helper global para forzar auth
+export const requireAuth = (callback) => {
+    return (e) => {
+        if (!currentUser) {
+            if (e && e.preventDefault) e.preventDefault();
+            if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
+            openAuthModal();
+        } else if (callback) {
+            callback(e);
+        }
+    };
+};
+
+let authBackdrop, authModalsContainer, mainContent, loginModal, registerModal;
+
+export const openAuthModal = () => {
+    if (authBackdrop && authModalsContainer && mainContent) {
+        authBackdrop.classList.remove('hidden');
+        authModalsContainer.classList.remove('hidden');
+        setTimeout(() => {
+            authBackdrop.classList.remove('opacity-0');
+            authModalsContainer.classList.remove('opacity-0');
+        }, 10);
+        mainContent.classList.add('blur-lg', 'pointer-events-none');
+    }
+};
+
+export const initAuth = () => {
+    // referencias a elementos del DOM
+    authBackdrop = document.getElementById('auth-backdrop');
+    authModalsContainer = document.getElementById('auth-modals');
+    mainContent = document.getElementById('main-content-wrapper');
+    loginModal = document.getElementById('login-modal');
+    registerModal = document.getElementById('register-modal');
+
+    const showRegisterBtn = document.getElementById('show-register-btn');
+    const showLoginBtn = document.getElementById('show-login-btn');
+    const openLoginBtn = document.getElementById('open-login-btn');
+    const mobileOpenLoginBtn = document.getElementById('mobile-open-login-btn');
+
+    let currentModal = loginModal;
+
+    // calculo de inclinacion 3d
+    const handleTiltEffect = (e) => {
+        if (!currentModal || authModalsContainer.classList.contains('hidden')) return;
+        const { clientX, clientY } = e;
+        const { offsetWidth, offsetHeight } = authModalsContainer;
+        const x = (clientX / offsetWidth) - 0.5;
+        const y = (clientY / offsetHeight) - 0.5;
+        currentModal.style.transform = `rotateX(${-y * 15}deg) rotateY(${x * 15}deg) scale(1.05)`;
+        currentModal.style.boxShadow = `${x * 15 * 0.8}px ${y * 15 * 0.8}px 30px rgba(0,0,0,0.2)`;
+    };
+
+    const resetTiltEffect = () => {
+        if (!currentModal) return;
+        currentModal.style.transform = 'rotateX(0) rotateY(0) scale(1)';
+        currentModal.style.boxShadow = '';
+    };
+
+    if (authModalsContainer) {
+        authModalsContainer.addEventListener('mousemove', handleTiltEffect);
+        authModalsContainer.addEventListener('mouseleave', resetTiltEffect);
+    }
+
+    const closeAuthModal = (e) => {
+        if (e && e.target !== authModalsContainer) return;
+        if (authBackdrop) authBackdrop.classList.add('opacity-0');
+        if (authModalsContainer) authModalsContainer.classList.add('opacity-0');
+        if (mainContent) mainContent.classList.remove('blur-lg', 'pointer-events-none');
+        setTimeout(() => {
+            if (authBackdrop) authBackdrop.classList.add('hidden');
+            if (authModalsContainer) authModalsContainer.classList.add('hidden');
+            if (registerModal) registerModal.classList.add('hidden');
+            if (loginModal) loginModal.classList.remove('hidden', 'scale-95', 'opacity-0');
+        }, 300);
+    };
+
+    // Funciones de Login y Logout
+    const handleLoginBtnClick = (e) => {
+        if (currentUser) {
+            // Logout logic
+            currentUser = null;
+            currentUserEmail = null;
+            userRole = null;
+            if (openLoginBtn) {
+                openLoginBtn.textContent = 'Acceder';
+                openLoginBtn.classList.add('bg-primary-500', 'text-white');
+                openLoginBtn.classList.remove('text-primary-500', 'font-bold', 'border-2', 'border-primary-500');
+            }
+            if (mobileOpenLoginBtn) {
+                mobileOpenLoginBtn.textContent = 'Acceder';
+            }
+            // Ocultar botón admin y papeleras
+            const adminBtn = document.getElementById('admin-add-event-btn');
+            if (adminBtn) adminBtn.classList.add('hidden');
+            
+            document.querySelectorAll('.admin-delete-btn').forEach(btn => {
+                btn.classList.add('hidden');
+            });
+        } else {
+            openAuthModal();
+        }
+    };
+
+    if (openLoginBtn) openLoginBtn.addEventListener('click', handleLoginBtnClick);
+    if (mobileOpenLoginBtn) mobileOpenLoginBtn.addEventListener('click', handleLoginBtnClick);
+    if (authModalsContainer) authModalsContainer.addEventListener('click', closeAuthModal);
+
+    const showRegisterModal = () => {
+        currentModal = registerModal;
+        if (loginModal) loginModal.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            if (loginModal) loginModal.classList.add('hidden');
+            if (registerModal) registerModal.classList.remove('hidden');
+            setTimeout(() => {
+                if (registerModal) registerModal.classList.remove('scale-95', 'opacity-0');
+            }, 50);
+        }, 300);
+    };
+
+    const showLoginModal = () => {
+        currentModal = loginModal;
+        if (registerModal) registerModal.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            if (registerModal) registerModal.classList.add('hidden');
+            if (loginModal) loginModal.classList.remove('hidden');
+            setTimeout(() => {
+                if (loginModal) loginModal.classList.remove('scale-95', 'opacity-0');
+            }, 50);
+        }, 300);
+    };
+
+    if (showRegisterBtn) showRegisterBtn.addEventListener('click', showRegisterModal);
+    if (showLoginBtn) showLoginBtn.addEventListener('click', showLoginModal);
+
+    // Login Form
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const statusDiv = document.getElementById('login-status');
+
+            showStatusMessage(statusDiv, 'procesando solicitud', true);
+
+            try {
+                let resultado, respuestaOk;
+                let esAdminMock = email === 'admin@muni.cl';
+                let esUserMock = email === 'user@muni.cl';
+                
+                if (esAdminMock || esUserMock) {
+                    resultado = { 
+                        usuario: esAdminMock ? 'Administrador' : 'Usuario Prueba', 
+                        rol: esAdminMock ? 'admin' : 'comun' 
+                    };
+                    respuestaOk = true;
+                } else {
+                    const respuesta = await fetch(`${API_CONFIG.urlBase}${API_CONFIG.endpoints.login}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ Email: email, Password: password })
+                    });
+                    resultado = await respuesta.json();
+                    respuestaOk = respuesta.ok;
+                }
+
+                if (respuestaOk) {
+                    showStatusMessage(statusDiv, `acceso concedido usuario ${resultado.usuario}`, true);
+
+                    // Set global state
+                    currentUser = resultado.usuario;
+                    currentUserEmail = email;
+                    userRole = esAdminMock ? 'admin' : (resultado.rol || 'comun');
+
+                    // Mostrar botón admin y papeleras si corresponde
+                    const adminBtn = document.getElementById('admin-add-event-btn');
+                    if (userRole === 'admin') {
+                        if (adminBtn) adminBtn.classList.remove('hidden');
+                        document.querySelectorAll('.admin-delete-btn').forEach(btn => {
+                            btn.classList.remove('hidden');
+                        });
+                    }
+
+                    setTimeout(() => {
+                        closeAuthModal();
+
+                        if (openLoginBtn) {
+                            openLoginBtn.textContent = `Salir (${currentUser})`;
+                            openLoginBtn.classList.remove('bg-primary-500', 'text-white');
+                            openLoginBtn.classList.add('text-primary-500', 'font-bold', 'border-2', 'border-primary-500');
+                        }
+
+                        if (mobileOpenLoginBtn) {
+                            mobileOpenLoginBtn.textContent = `Salir (${currentUser})`;
+                        }
+
+                    }, 2000);
+
+                } else {
+                    showStatusMessage(statusDiv, resultado.error || 'Error de credenciales', false);
+                }
+            } catch (error) {
+                console.error(error);
+                showStatusMessage(statusDiv, 'error de conexion', false);
+            }
+        });
+    }
+
+    // selector de genero condicional
+    const registerGender = document.getElementById('register-gender');
+    if (registerGender) {
+        registerGender.addEventListener('change', (e) => {
+            const wrapper = document.getElementById('other-gender-wrapper');
+            if (wrapper) wrapper.classList.toggle('hidden', e.target.value !== 'otro');
+        });
+    }
+
+    // Register Form
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const datos = {
+                Rut: document.getElementById('register-rut').value,
+                Nombre: document.getElementById('register-name').value,
+                Apellido: document.getElementById('register-lastname').value,
+                Email: document.getElementById('register-email').value,
+                Telefono: document.getElementById('register-phone').value,
+                FechaNacimiento: document.getElementById('register-birthdate').value,
+                Genero: document.getElementById('register-gender').value,
+                GeneroOtro: document.getElementById('register-other-gender').value,
+                Password: document.getElementById('register-password').value
+            };
+
+            const statusDiv = document.getElementById('register-status');
+            showStatusMessage(statusDiv, 'procesando registro', true);
+
+            try {
+                const respuesta = await fetch(`${API_CONFIG.urlBase}${API_CONFIG.endpoints.register}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+
+                const resultado = await respuesta.json();
+
+                if (respuesta.ok) {
+                    showStatusMessage(statusDiv, 'registro exitoso', true);
+                    registerForm.reset();
+
+                    setTimeout(() => {
+                        showLoginModal();
+                        statusDiv.classList.add('hidden');
+                    }, 2000);
+                } else {
+                    showStatusMessage(statusDiv, 'error ' + resultado.error, false);
+                }
+            } catch (error) {
+                console.error(error);
+                showStatusMessage(statusDiv, 'error de conexion', false);
+            }
+        });
+    }
+};
