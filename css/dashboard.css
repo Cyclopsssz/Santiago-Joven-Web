@@ -1,0 +1,17 @@
+/* Estilos específicos para el Dashboard Administrativo */
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f8fafc; /* light-bg de Tailwind config */
+}
+
+/* Efectos hover sutiles para tarjetas del dashboard */
+.dashboard-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}

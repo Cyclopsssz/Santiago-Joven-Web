@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apoyo Joven: Crece, participa y aprende</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'sans': ['Poppins', 'sans-serif'],
+          },
+          colors: {
+            'primary': {
+              '500': '#0ea5e9',
+              '600': '#0284c7',
+            },
+            'secondary': {
+              '500': '#10b981',
+              '600': '#059669',
+            },
+            'accent': {
+              '500': '#f97316',
+              '600': '#ea580c',
+            },
+            'light-bg': '#f8fafc',
+          }
+        }
+      }
+    }
+  </script>
+  <link href="../css/styles.css" rel="stylesheet">
+</head>
+
+<body class="bg-white text-gray-700 font-sans antialiased">
+  <!-- ==================== MODALES DE AUTENTICACIÓN ==================== -->
+  <div id="auth-backdrop"
+    class="fixed inset-0 bg-black/30 backdrop-blur-md z-50 transition-opacity duration-300 hidden opacity-0"></div>
+  <div id="auth-modals"
+    class="fixed inset-0 z-[60] flex items-center justify-center p-4 overflow-y-auto hidden opacity-0">
+    <div id="login-modal"
+      class="card w-full max-w-md mx-auto transform transition-all duration-300 scale-100 opacity-100 my-auto click-stop-propagation">
+      <h2
+        class="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
+        Iniciar Sesión
+      </h2>
+      <form id="login-form" class="space-y-4">
+        <div id="login-status" class="hidden p-3 rounded-lg text-sm"></div>
+        <div>
+          <label for="login-email" class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+          <input type="email" id="login-email" class="form-input" placeholder="tu@correo.com">
+        </div>
+        <div>
+          <label for="login-password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+          <input type="password" id="login-password" class="form-input" placeholder="••••••••">
+        </div>
+        <div class="text-right">
+          <a href="#" class="text-sm text-primary-500 hover:underline">¿Olvidaste tu contraseña?</a>
+        </div>
+        <div>
+          <button type="submit" class="btn btn-accent w-full py-3 text-base">Ingresar</button>
+        </div>
+        <div class="text-center text-gray-600">
+          ¿No tienes una cuenta?
+          <button type="button" id="show-register-btn" class="font-semibold text-primary-500 hover:underline">Crea una
+            aquí</button>
+        </div>
+      </form>
+    </div>
+    <div id="register-modal"
+      class="card w-full max-w-lg mx-auto transform transition-all duration-300 scale-95 opacity-0 hidden my-auto click-stop-propagation">
+      <h2
+        class="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
+        Crear Cuenta
+      </h2>
+      <form id="register-form" class="space-y-4">
+        <div id="register-status" class="hidden p-3 rounded-lg text-sm"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="register-rut" class="block text-sm font-medium text-gray-700 mb-1">RUT</label>
+            <input type="text" id="register-rut" class="form-input" placeholder="12.345.678-9">
+          </div>
+          <div>
+            <label for="register-name" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+            <input type="text" id="register-name" class="form-input" placeholder="Juan">
+          </div>
+          <div>
+            <label for="register-lastname" class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
+            <input type="text" id="register-lastname" class="form-input" placeholder="Pérez">
+          </div>
+          <div>
+            <label for="register-email" class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+            <input type="email" id="register-email" class="form-input" placeholder="tu@correo.com">
+          </div>
+          <div>
+            <label for="register-password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+            <input type="password" id="register-password" class="form-input" placeholder="••••••••">
+          </div>
+          <div>
+            <label for="register-phone" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+            <div class="flex">
+              <span
+                class="inline-flex items-center px-4 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm whitespace-nowrap">+56
+                9</span>
+              <input type="tel" id="register-phone"
+                class="w-full px-4 py-2 border border-gray-300 rounded-r-lg focus:ring-primary-500 focus:border-primary-500"
+                placeholder="1234 5678">
+            </div>
+          </div>
+          <div>
+            <label for="register-birthdate" class="block text-sm font-medium text-gray-700 mb-1">Fecha de
+              Nacimiento</label>
+            <input type="date" id="register-birthdate" class="form-input">
+          </div>
+          <div>
+            <label for="register-gender" class="block text-sm font-medium text-gray-700 mb-1">Género</label>
+            <select id="register-gender" class="form-input bg-white">
+              <option value="">Selecciona una opción...</option>
+              <option value="masculino">Masculino</option>
+              <option value="femenino">Femenino</option>
+              <option value="otro">Otro</option>
+              <option value="no-decir">Prefiero no decirlo</option>
+            </select>
+          </div>
+          <div id="other-gender-wrapper" class="hidden">
+            <label for="register-other-gender" class="block text-sm font-medium text-gray-700 mb-1">Especificar
+              género</label>
+            <input type="text" id="register-other-gender" class="form-input" placeholder="Tu género">
+          </div>
+        </div>
+        <div class="pt-4">
+          <button type="submit" class="btn btn-secondary w-full py-3 text-base">Crear Cuenta</button>
+        </div>
+        <div class="text-center text-gray-600">
+          ¿Ya tienes una cuenta?
+          <button type="button" id="show-login-btn"
+            class="font-semibold text-primary-500 hover:underline">Acceder</button>
+        </div>
+      </form>
+    </div>
+
+
+    <!-- Modal de Inscripción -->
+    <div id="enroll-modal"
+      class="card w-full max-w-md mx-auto transform transition-all duration-300 scale-95 opacity-0 hidden my-auto click-stop-propagation">
+      <h2
+        class="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
+        Inscripción
+      </h2>
+      <div class="text-center space-y-4">
+        <p class="text-gray-600 text-lg">¿Deseas confirmar tu inscripción a <strong id="enroll-course-name"
+            class="text-gray-800"></strong>?</p>
+        <p class="text-sm text-gray-500 mb-6">Enviaremos un comprobante a tu correo electrónico.</p>
+        <div id="enroll-status" class="hidden p-3 rounded-lg text-sm mb-4"></div>
+        <div class="flex flex-col space-y-3">
+          <button id="confirm-enroll-btn" class="btn btn-primary w-full py-3 text-base">Confirmar Inscripción</button>
+          <button id="close-enroll-btn" class="btn btn-outline w-full py-3 text-base">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
+  <div id="main-content-wrapper" class="transition-all duration-500">
+
+    <!-- ==================== ENCABEZADO Y NAVEGACIÓN ==================== -->
+    <header class="bg-white w-full sticky top-0 z-40 shadow-sm">
+      <div class="w-full px-4 lg:px-8 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-8">
+          <a href="#inicio" class="text-3xl font-bold text-primary-500 flex-shrink-0">Apoyo Joven</a>
+          <a href="dashboard.html" target="_blank" id="admin-dashboard-btn" class="text-primary-500 hover:text-primary-600 bg-primary-50 hover:bg-primary-100 p-2 rounded-lg transition-colors duration-200 flex items-center justify-center hidden" title="Dashboard">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+              fill="currentColor">
+              <path
+                d="M120-520v-320h320v320H120Zm0 400v-320h320v320H120Zm400-400v-320h320v320H520Zm0 400v-320h320v320H520Z" />
+            </svg>
+          </a>
+        </div>
+        <nav id="desktop-nav" class="hidden lg:flex items-center space-x-1 text-sm font-medium">
+          <a href="#inicio"
+            class="nav-link px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">Inicio</a>
+          <div class="relative group">
+            <button
+              class="nav-link px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center">
+              Apoyo <i class="fas fa-chevron-down text-xs ml-1.5"></i>
+            </button>
+            <div class="dropdown-menu">
+              <a href="#apoyo" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Resumen General</a>
+              <a href="#apoyo-asesorias" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Asesorías</a>
+              <a href="#apoyo-preu" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Preuniversitario</a>
+            </div>
+          </div>
+          <div class="relative group">
+            <button
+              class="nav-link px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center">
+              Proyección <i class="fas fa-chevron-down text-xs ml-1.5"></i>
+            </button>
+            <div class="dropdown-menu">
+              <a href="#proyeccion" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Resumen General</a>
+              <a href="#proyeccion-cursos" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Cursos</a>
+            </div>
+          </div>
+          <a href="#accion"
+            class="nav-link px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">Acción</a>
+          <div class="relative group">
+            <button
+              class="nav-link px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center">
+              Programas <i class="fas fa-chevron-down text-xs ml-1.5"></i>
+            </button>
+            <div class="dropdown-menu">
+              <a href="#programas" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Resumen General</a>
+              <a href="#programas-lazos" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Lazos</a>
+              <a href="#programas-senda" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Senda</a>
+            </div>
+          </div>
+          <a href="#salud-mental"
+            class="nav-link px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 text-secondary-600 font-bold">Salud
+            Mental</a>
+          <div class="relative group">
+            <button
+              class="nav-link px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center">
+              Conexión <i class="fas fa-chevron-down text-xs ml-1.5"></i>
+            </button>
+            <div class="dropdown-menu">
+              <a href="#conexion" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Resumen General</a>
+              <a href="#conexion-actividades" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Actividades</a>
+              <a href="#conexion-talleres" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Talleres</a>
+            </div>
+          </div>
+          <a href="#calendario"
+            class="nav-link px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">Calendario</a>
+          <a href="#encuestas"
+            class="nav-link px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">Encuestas</a>
+          <a href="#contacto"
+            class="nav-link px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">Contacto</a>
+          <button id="open-login-btn"
+            class="ml-2 px-5 py-2 rounded-full bg-primary-500 text-white font-semibold shadow-md hover:bg-primary-600 transition-colors duration-300 flex-shrink-0">Acceder</button>
+        </nav>
+        <button id="hamburger-btn" class="lg:hidden text-2xl text-gray-700"><i class="fas fa-bars"></i></button>
+      </div>
+      <div id="mobile-menu"
+        class="fixed top-0 left-0 w-full h-full bg-white z-50 transform -translate-x-full transition-transform duration-300 ease-in-out md:hidden">
+        <div class="flex justify-between items-center p-6 border-b">
+          <h2 class="text-2xl font-bold text-primary-500">Menú</h2>
+          <button id="close-menu-btn" class="text-3xl text-gray-600">&times;</button>
+        </div>
+        <nav class="flex flex-col p-6 space-y-3">
+          <a href="#inicio" class="mobile-nav-link text-lg text-gray-700 p-3 rounded-lg hover:bg-gray-100">Inicio</a>
+          <a href="#apoyo" class="mobile-nav-link text-lg text-gray-700 p-3 rounded-lg hover:bg-gray-100">Apoyo
+            Joven</a>
+          <a href="#proyeccion"
+            class="mobile-nav-link text-lg text-gray-700 p-3 rounded-lg hover:bg-gray-100">Proyección Joven</a>
+          <a href="#accion" class="mobile-nav-link text-lg text-gray-700 p-3 rounded-lg hover:bg-gray-100">Acción
+            Joven</a>
+          <a href="#programas"
+            class="mobile-nav-link text-lg text-gray-700 p-3 rounded-lg hover:bg-gray-100">Programas</a>
+          <a href="#salud-mental"
+            class="mobile-nav-link text-lg text-secondary-600 font-semibold p-3 rounded-lg hover:bg-gray-100">Salud
+            Mental</a>
+          <a href="#conexion" class="mobile-nav-link text-lg text-gray-700 p-3 rounded-lg hover:bg-gray-100">Conexión
+            Comunitaria</a>
+          <a href="#calendario"
+            class="mobile-nav-link text-lg text-gray-700 p-3 rounded-lg hover:bg-gray-100">Calendario</a>
+          <a href="#encuestas"
+            class="mobile-nav-link text-lg text-gray-700 p-3 rounded-lg hover:bg-gray-100">Encuestas</a>
+          <a href="#contacto" class="mobile-nav-link text-lg text-gray-700 p-3 rounded-lg hover:bg-gray-100">Contacto y
+            Ubicación</a>
+          <button id="mobile-open-login-btn"
+            class="mt-4 w-full px-6 py-3 rounded-full bg-primary-500 text-white font-semibold shadow-md hover:bg-primary-600 transition-colors duration-300">Acceder</button>
+        </nav>
+      </div>
+    </header>
+    <main>
+
+      <!-- ==================== SECCIÓN: INICIO ==================== -->
+      <section id="inicio"
+        class="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-500 to-secondary-500 text-white pt-20 pb-10 px-6">
+        <div class="container mx-auto max-w-7xl text-center">
+          <h1 class="text-4xl md:text-6xl font-bold mb-6 drop-shadow-lg">Apoyo Joven: Crece, participa y aprende</h1>
+          <p class="text-xl md:text-2xl mb-12 max-w-3xl mx-auto opacity-90">
+            Tu espacio para encontrar orientación, capacitarte en nuevas habilidades y conectar con tu comunidad.
+            <br class="hidden md:block">
+            <strong>Dirigido a jóvenes de 14 a 29 años.</strong>
+          </p>
+          <a href="#apoyo" class="btn btn-accent text-lg px-8 py-3">¡Descubre los programas!</a>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20">
+            <a href="#apoyo" class="bg-white/20 p-6 rounded-lg backdrop-blur-sm hover:bg-white/30 transition-all">
+              <i class="fas fa-hands-helping text-4xl mb-3"></i>
+              <h3 class="text-xl font-semibold">Apoyo Joven</h3>
+            </a>
+            <a href="#proyeccion" class="bg-white/20 p-6 rounded-lg backdrop-blur-sm hover:bg-white/30 transition-all">
+              <i class="fas fa-rocket text-4xl mb-3"></i>
+              <h3 class="text-xl font-semibold">Proyección</h3>
+            </a>
+            <a href="#accion" class="bg-white/20 p-6 rounded-lg backdrop-blur-sm hover:bg-white/30 transition-all">
+              <i class="fas fa-bullhorn text-4xl mb-3"></i>
+              <h3 class="text-xl font-semibold">Acción Joven</h3>
+            </a>
+            <a href="#conexion" class="bg-white/20 p-6 rounded-lg backdrop-blur-sm hover:bg-white/30 transition-all">
+              <i class="fas fa-users text-4xl mb-3"></i>
+              <h3 class="text-xl font-semibold">Conexión</h3>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== SECCIÓN: APOYO JOVEN ==================== -->
+      <section id="apoyo" class="py-20 px-6 bg-light-bg">
+        <div class="container mx-auto max-w-7xl">
+          <i class="fas fa-hands-helping text-4xl text-primary-500 text-center w-full block mb-4"></i>
+          <h2 class="section-title">Apoyo Joven</h2>
+          <p class="section-subtitle">Te acompañamos en tus trámites, estudios y beneficios. Encuentra aquí toda la
+            asesoría que necesitas.</p>
+          <div id="apoyo-asesorias" class="mb-16 pt-16">
+            <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 text-center">Asesorías</h3>
+            <div class="grid md:grid-cols-2 gap-8">
+              <div class="card">
+                <i class="fas fa-briefcase text-3xl text-secondary-500 mb-4"></i>
+                <h4 class="text-xl font-semibold mb-2">Capacitación Adulto</h4>
+                <p class="text-gray-600">Programas de alfabetización digital y capacitación tecnológica para adultos.
+                  Aprende a usar las herramientas de hoy.</p>
+              </div>
+              <div class="card">
+                <i class="fas fa-graduation-cap text-3xl text-secondary-500 mb-4"></i>
+                <h4 class="text-xl font-semibold mb-2">Asesoría a Jóvenes</h4>
+                <p class="text-gray-600">¿Dudas con la TNE (Pase Escolar), el FUAS (Beneficios estudiantiles) o el
+                  Servicio Militar? Te orientamos paso a paso.</p>
+              </div>
+            </div>
+          </div>
+          <div id="apoyo-preu" class="mb-16 pt-16">
+            <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 text-center">Preuniversitario Gratuito</h3>
+            <div class="grid md:grid-cols-3 gap-8">
+              <div class="card text-center">
+                <i class="fas fa-book-open text-3xl text-accent-500 mb-4"></i>
+                <h4 class="text-xl font-semibold mb-2">Competencia Lectora</h4>
+                <p>Potencia tu comprensión y análisis de textos.</p>
+              </div>
+              <div class="card text-center">
+                <i class="fas fa-calculator text-3xl text-accent-500 mb-4"></i>
+                <h4 class="text-xl font-semibold mb-2">M1 (Matemática)</h4>
+                <p>Refuerza tus habilidades numéricas para la PAES.</p>
+              </div>
+              <div class="card text-center">
+                <i class="fas fa-landmark text-3xl text-accent-500 mb-4"></i>
+                <h4 class="text-xl font-semibold mb-2">Ciencias Sociales</h4>
+                <p>Prepárate para la prueba de Historia y Cs. Sociales.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="proyeccion" class="py-20 px-6 bg-white">
+        <div class="container mx-auto max-w-7xl">
+          <i class="fas fa-rocket text-4xl text-secondary-500 text-center w-full block mb-4"></i>
+          <h2 class="section-title">Proyección Joven</h2>
+          <p class="section-subtitle">Impulsa tu futuro. Aquí encontrarás cursos y herramientas para tu crecimiento
+            personal y profesional.</p>
+          <div id="proyeccion-cursos" class="pt-16">
+            <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 text-center">Cursos Destacados</h3>
+            <div class="grid md:grid-cols-2 gap-8">
+              <div class="card">
+                <i class="fas fa-robot text-3xl text-primary-500 mb-4"></i>
+                <h4 class="text-xl font-semibold mb-2">Introducción a la Inteligencia Artificial (IA)</h4>
+                <p class="text-gray-600 mb-4">Descubre los fundamentos de la IA, aprende sobre machine learning y cómo
+                  esta tecnología está cambiando el mundo.</p>
+                <button class="btn btn-outline btn-sm requires-auth enroll-btn"
+                  data-title="Introducción a la Inteligencia Artificial (IA)">Inscríbete</button>
+              </div>
+              <div class="card">
+                <i class="fas fa-file-excel text-3xl text-secondary-500 mb-4"></i>
+                <h4 class="text-xl font-semibold mb-2">Excel: Básico e Intermedio</h4>
+                <p class="text-gray-600 mb-4">Domina la planilla de cálculo más usada. Desde fórmulas básicas hasta
+                  tablas dinámicas. Esencial para cualquier trabajo.</p>
+                <button class="btn btn-outline btn-sm requires-auth enroll-btn"
+                  data-title="Excel: Básico e Intermedio">Inscríbete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="accion" class="py-20 px-6 bg-light-bg">
+        <div class="container mx-auto max-w-7xl">
+          <i class="fas fa-bullhorn text-4xl text-accent-500 text-center w-full block mb-4"></i>
+          <h2 class="section-title">Acción Joven</h2>
+          <p class="section-subtitle">¡Tu energía puede cambiar las cosas! Súmate a nuestras iniciativas sociales y
+            proyectos de voluntariado.</p>
+          <div class="text-center max-w-3xl mx-auto">
+            <div class="card bg-white">
+              <h3 class="text-2xl font-semibold mb-4">Proyectos de Impacto Social</h3>
+              <p class="text-gray-600 mb-6">Participa en campañas de reforestación, visitas a hogares de ancianos,
+                colectas de alimentos y más. Conecta con otros jóvenes que, como tú, quieren dejar una huella positiva.
+              </p>
+              <button class="btn btn-accent requires-auth enroll-btn"
+                data-title="Programa de Voluntariado Juvenil">¡Quiero ser voluntario!</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="programas" class="py-20 px-6 bg-white">
+        <div class="container mx-auto max-w-7xl">
+          <i class="fas fa-handshake-angle text-4xl text-primary-500 text-center w-full block mb-4"></i>
+          <h2 class="section-title">Nuestros Programas</h2>
+          <p class="section-subtitle">Conoce los programas insertos en la Oficina de la Juventud para apoyarte.</p>
+          <div id="programas-lazos" class="mb-16 pt-20">
+            <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 text-center"><i
+                class="fas fa-hands-holding-child text-secondary-500 mr-4"></i>Programa Lazos</h3>
+            <div class="card max-w-4xl mx-auto text-left">
+              <h4 class="text-xl font-semibold mb-4 text-secondary-600">Definición y Contexto</h4>
+              <p class="text-gray-600 mb-4">El Programa Lazos es una estrategia de intervención y prevención social del
+                Gobierno de Chile, específicamente de la Subsecretaría de Prevención del Delito (SPD), que es
+                implementado a nivel local por diversas municipalidades, incluida la de Santiago.</p>
+              <p class="text-gray-600 mb-6">En Santiago, la Oficina de la Juventud (OMJ) es una de las unidades que
+                colabora o ejecuta este programa.</p>
+              <h4 class="text-xl font-semibold mb-4 text-secondary-600">Objetivo Principal</h4>
+              <p class="text-gray-600 mb-6">El objetivo central del Programa Lazos es prevenir la delincuencia y las
+                conductas de riesgo en jóvenes. Busca intervenir tempranamente para evitar que los jóvenes que presentan
+                factores de riesgo o conductas transgresoras escalen hacia carreras delictivas.</p>
+              <h4 class="text-xl font-semibold mb-4 text-secondary-600">Población Objetivo</h4>
+              <p class="text-gray-600 mb-6">Está enfocado en niños, niñas y adolescentes (NNA), generalmente en un rango
+                de edad entre los 10 y 17 años, que presentan factores de riesgo socio-delictivo.</p>
+              <h4 class="text-xl font-semibold mb-4 text-secondary-600">Metodología de Intervención</h4>
+              <p class="text-gray-600 mb-4">Lazos no es un taller o una actividad puntual, sino una intervención
+                intensiva. Su metodología más conocida se basa en la Terapia Multisistémica (MST):</p>
+              <ul class="list-disc list-inside space-y-3 text-gray-600">
+                <li><strong>Enfoque Integral:</strong> En lugar de centrarse solo en el joven, la terapia involucra a
+                  todos los sistemas que lo rodean.</li>
+                <li><strong>Intervención Familiar:</strong> Se trabaja intensamente con la familia para entregarles
+                  herramientas de crianza y establecer límites.</li>
+                <li><strong>Entorno:</strong> También interviene en el entorno escolar y en el barrio.</li>
+              </ul>
+            </div>
+          </div>
+          <div id="programas-senda" class="mb-16 pt-20">
+            <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 text-center"><i
+                class="fas fa-shield-heart text-accent-500 mr-4"></i>Programa Senda</h3>
+            <div class="card max-w-4xl mx-auto text-left">
+              <h4 class="text-xl font-semibold mb-4 text-accent-600">Definición y Contexto</h4>
+              <p class="text-gray-600 mb-6">El programa Senda inserto en la Oficina de la Juventud de Santiago es la
+                estrategia de prevención comunitaria del Servicio Nacional para la Prevención y Rehabilitación del
+                Consumo de Drogas y Alcohol (SENDA).</p>
+              <h4 class="text-xl font-semibold mb-4 text-accent-600">Objetivo Principal</h4>
+              <p class="text-gray-600 mb-6">El objetivo central es prevenir el consumo de alcohol y otras drogas en la
+                población, promoviendo estilos de vida saludables y fortaleciendo factores protectores.</p>
+              <h4 class="text-xl font-semibold mb-4 text-accent-600">Población Objetivo</h4>
+              <p class="text-gray-600 mb-6">Su foco principal son los niños, niñas, adolescentes y jóvenes que viven,
+                estudian o participan en la comuna de Santiago, así como sus familias y comunidades educativas.</p>
+              <h4 class="text-xl font-semibold mb-4 text-accent-600">Metodología de Intervención</h4>
+              <p class="text-gray-600 mb-4">La intervención se basa en un enfoque territorial, comunitario y de gestión
+                de redes. Incluye prevención en colegios, intervención comunitaria, coordinación de redes locales y
+                orientación/derivación de casos.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="salud-mental" class="py-20 px-6 bg-blue-50">
+        <div class="container mx-auto max-w-7xl">
+          <div class="text-center mb-12">
+            <i class="fas fa-heart-pulse text-4xl text-primary-500 block mb-4"></i>
+            <h2 class="section-title">Salud Mental y Bienestar</h2>
+            <p class="section-subtitle">Tu bienestar emocional es prioridad. No estás solo/a. Aquí encontrarás canales
+              de ayuda inmediata y profesional.</p>
+          </div>
+          <div class="grid md:grid-cols-3 gap-8 text-center">
+            <div class="card border-t-4 border-primary-500">
+              <div class="mb-4 inline-block p-4 rounded-full bg-primary-100 text-primary-600"><i
+                  class="fas fa-phone-volume text-3xl"></i></div>
+              <h3 class="text-2xl font-bold text-gray-800 mb-2">Fono *4141</h3>
+              <p class="text-sm font-semibold text-primary-600 mb-4 uppercase tracking-wider">Prevención del Suicidio
+              </p>
+              <p class="text-gray-600 mb-6">"No estás solo, no estás sola". Línea gratuita, confidencial y disponible
+                las 24 horas.</p>
+            </div>
+            <div class="card border-t-4 border-red-500">
+              <div class="mb-4 inline-block p-4 rounded-full bg-red-100 text-red-600"><i
+                  class="fas fa-ambulance text-3xl"></i></div>
+              <h3 class="text-2xl font-bold text-gray-800 mb-2">SAMU 131</h3>
+              <p class="text-sm font-semibold text-red-600 mb-4 uppercase tracking-wider">Emergencias Vitales</p>
+              <p class="text-gray-600 mb-6">Llama a la Ambulancia (SAMU) en caso de riesgo vital inmediato o emergencia
+                grave.</p>
+            </div>
+            <div class="card border-t-4 border-secondary-500">
+              <div class="mb-4 inline-block p-4 rounded-full bg-secondary-100 text-secondary-600"><i
+                  class="fas fa-user-md text-3xl"></i></div>
+              <h3 class="text-2xl font-bold text-gray-800 mb-2">Salud Responde</h3>
+              <p class="text-sm font-semibold text-secondary-600 mb-4 uppercase tracking-wider">Orientación 24/7</p>
+              <p class="text-gray-600 mb-6">Llama al <strong>600 360 77 77</strong> para recibir orientación de
+                profesionales de salud.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="conexion" class="py-20 px-6 bg-white">
+        <div class="container mx-auto max-w-7xl">
+          <i class="fas fa-users text-4xl text-primary-500 text-center w-full block mb-4"></i>
+          <h2 class="section-title">Conexión Comunitaria</h2>
+          <p class="section-subtitle">Participa en actividades recreativas, culturales y formativas. Conoce gente nueva
+            y desarrolla tus talentos.</p>
+          <div class="grid md:grid-cols-2 gap-8">
+            <div id="conexion-actividades" class="pt-16">
+              <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8">Actividades</h3>
+              <ul class="space-y-4">
+                <li class="card flex items-center gap-4"><i
+                    class="fas fa-calendar-check text-2xl text-secondary-500"></i><span>Ferias vocacionales y de
+                    emprendimiento.</span></li>
+                <li class="card flex items-center gap-4"><i
+                    class="fas fa-landmark text-2xl text-secondary-500"></i><span>Viaje cultural al Museo</span></li>
+                <li class="card flex items-center gap-4"><i
+                    class="fas fa-comments text-2xl text-secondary-500"></i><span>Reuniones y círculos de
+                    conversación.</span></li>
+              </ul>
+            </div>
+            <div id="conexion-talleres" class="pt-16">
+              <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8">Talleres</h3>
+              <ul class="space-y-4">
+                <li class="card flex items-center gap-4"><i
+                    class="fas fa-microphone-alt text-2xl text-accent-500"></i><span>Taller de liderazgo y
+                    oratoria.</span></li>
+                <li class="card flex items-center gap-4"><i
+                    class="fas fa-paint-brush text-2xl text-accent-500"></i><span>Talleres creativos (Música, dibujo,
+                    teatro).</span></li>
+                <li class="card flex items-center gap-4"><i
+                    class="fas fa-lightbulb text-2xl text-accent-500"></i><span>Taller de debate y pensamiento
+                    crítico.</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="calendario" class="py-20 px-6 bg-light-bg">
+        <div class="container mx-auto max-w-7xl">
+          <i class="fas fa-calendar-alt text-4xl text-secondary-500 text-center w-full block mb-4"></i>
+          <h2 class="section-title">Calendario de Actividades</h2>
+          <p class="section-subtitle">Revisa nuestros próximos eventos. ¡Filtra por categoría y no te pierdas nada!</p>
+          <div id="calendar-filters" class="flex flex-wrap justify-center gap-3 mb-10">
+            <button class="filter-btn btn btn-outline active" data-filter="all"><i
+                class="fas fa-globe-americas mr-2"></i>Todos</button>
+            <button class="filter-btn btn btn-outline" data-filter="feria"><i
+                class="fas fa-store mr-2"></i>Ferias</button>
+            <button class="filter-btn btn btn-outline" data-filter="taller"><i
+                class="fas fa-chalkboard-teacher mr-2"></i>Talleres</button>
+            <button class="filter-btn btn btn-outline" data-filter="curso"><i
+                class="fas fa-laptop-code mr-2"></i>Cursos</button>
+            <button class="filter-btn btn btn-outline" data-filter="campana"><i
+                class="fas fa-heart mr-2"></i>Campañas</button>
+          </div>
+          <div id="event-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="event-card card relative" data-type="feria">
+              <div class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold inline-block mb-3">
+                Feria</div>
+              <h4 class="text-xl font-semibold mb-2">Feria Vocacional 2025</h4>
+              <p class="text-gray-600"><i class="fas fa-calendar-day mr-2"></i>10 de Noviembre</p>
+            </div>
+            <div class="event-card card relative" data-type="taller">
+              <div class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold inline-block mb-3">
+                Taller</div>
+              <h4 class="text-xl font-semibold mb-2">Taller de Liderazgo Juvenil</h4>
+              <p class="text-gray-600"><i class="fas fa-calendar-day mr-2"></i>14 de Noviembre</p>
+            </div>
+            <div class="event-card card relative" data-type="curso">
+              <div class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold inline-block mb-3">
+                Curso</div>
+              <h4 class="text-xl font-semibold mb-2">Inicio Curso de IA</h4>
+              <p class="text-gray-600"><i class="fas fa-calendar-day mr-2"></i>20 de Noviembre</p>
+            </div>
+            <div class="event-card card relative" data-type="campana">
+              <div class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold inline-block mb-3">
+                Campaña</div>
+              <h4 class="text-xl font-semibold mb-2">Campaña Solidaria Navideña</h4>
+              <p class="text-gray-600"><i class="fas fa-calendar-day mr-2"></i>28 de Noviembre</p>
+            </div>
+            <div class="event-card card relative" data-type="taller">
+              <div class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold inline-block mb-3">
+                Taller</div>
+              <h4 class="text-xl font-semibold mb-2">Taller de Oratoria</h4>
+              <p class="text-gray-600"><i class="fas fa-calendar-day mr-2"></i>02 de Diciembre</p>
+            </div>
+            <div class="event-card card relative" data-type="feria">
+              <div class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold inline-block mb-3">
+                Feria</div>
+              <h4 class="text-xl font-semibold mb-2">Feria de Emprendimiento</h4>
+              <p class="text-gray-600"><i class="fas fa-calendar-day mr-2"></i>05 de Diciembre</g>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="encuestas" class="py-20 px-6 bg-white">
+        <div class="container mx-auto max-w-4xl">
+          <div class="text-center mb-10">
+            <i class="fas fa-clipboard-list text-4xl text-accent-500 mb-4"></i>
+            <h2 class="section-title">Tu Opinión Cuenta</h2>
+            <p class="section-subtitle">Ayúdanos a mejorar los programas comunales. Esta encuesta es anónima y nos sirve
+              para generar estadísticas y nuevas soluciones.</p>
+          </div>
+          <form id="survey-form" class="card bg-gray-50 p-8 space-y-8">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">1. Datos Generales</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Rango de Edad</label>
+                  <select id="survey-age" class="form-input">
+                    <option value="">Selecciona...</option>
+                    <option value="14-17">14 - 17 años</option>
+                    <option value="18-24">18 - 24 años</option>
+                    <option value="25-29">25 - 29 años</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Ocupación Principal</label>
+                  <select id="survey-occupation" class="form-input">
+                    <option value="">Selecciona...</option>
+                    <option value="estudiante">Estudiante</option>
+                    <option value="trabajador">Trabajador/a</option>
+                    <option value="buscando">Buscando empleo</option>
+                    <option value="ambos">Estudio y Trabajo</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                  <div id="survey-occupation-other-wrapper" class="mt-2 hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Especificar ocupación</label>
+                    <input type="text" id="survey-occupation-other" class="form-input" placeholder="Tu ocupación">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">2. Intereses y Necesidades</h3>
+              <p class="text-sm text-gray-600 mb-3">¿Qué temas consideras prioritarios para la juventud en Santiago?
+                (Selecciona todos los que apliquen)</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <label
+                  class="flex items-center space-x-3 bg-white p-3 rounded-lg border cursor-pointer hover:bg-gray-50">
+                  <input type="checkbox" name="interests" value="salud_mental"
+                    class="text-primary-500 focus:ring-primary-500 rounded w-5 h-5">
+                  <span>Salud Mental y Bienestar</span>
+                </label>
+                <label
+                  class="flex items-center space-x-3 bg-white p-3 rounded-lg border cursor-pointer hover:bg-gray-50">
+                  <input type="checkbox" name="interests" value="educacion"
+                    class="text-primary-500 focus:ring-primary-500 rounded w-5 h-5">
+                  <span>Apoyo Educativo / Preu</span>
+                </label>
+                <label
+                  class="flex items-center space-x-3 bg-white p-3 rounded-lg border cursor-pointer hover:bg-gray-50">
+                  <input type="checkbox" name="interests" value="empleo"
+                    class="text-primary-500 focus:ring-primary-500 rounded w-5 h-5">
+                  <span>Empleo y Capacitación</span>
+                </label>
+                <label
+                  class="flex items-center space-x-3 bg-white p-3 rounded-lg border cursor-pointer hover:bg-gray-50">
+                  <input type="checkbox" name="interests" value="cultura"
+                    class="text-primary-500 focus:ring-primary-500 rounded w-5 h-5">
+                  <span>Arte, Cultura y Recreación</span>
+                </label>
+                <label
+                  class="flex items-center space-x-3 bg-white p-3 rounded-lg border cursor-pointer hover:bg-gray-50">
+                  <input type="checkbox" name="interests" value="seguridad"
+                    class="text-primary-500 focus:ring-primary-500 rounded w-5 h-5">
+                  <span>Seguridad y Espacios Públicos</span>
+                </label>
+                <label
+                  class="flex items-center space-x-3 bg-white p-3 rounded-lg border cursor-pointer hover:bg-gray-50">
+                  <input type="checkbox" name="interests" value="medioambiente"
+                    class="text-primary-500 focus:ring-primary-500 rounded w-5 h-5">
+                  <span>Medioambiente y Reciclaje</span>
+                </label>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">3. Evaluación y Sugerencias</h3>
+              <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">¿Cómo calificarías la oferta actual de
+                  programas juveniles?</label>
+                <div class="flex flex-wrap gap-4 sm:gap-8 justify-center md:justify-start mt-2">
+                  <label
+                    class="flex flex-col items-center cursor-pointer text-gray-400 hover:text-accent-500 transition-colors group">
+                    <input type="radio" name="rating" value="1" class="sr-only peer">
+                    <i
+                      class="fas fa-star text-3xl peer-checked:text-accent-500 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-xs mt-1 peer-checked:text-accent-600 font-semibold">Mala</span>
+                  </label>
+                  <label
+                    class="flex flex-col items-center cursor-pointer text-gray-400 hover:text-accent-500 transition-colors group">
+                    <input type="radio" name="rating" value="2" class="sr-only peer">
+                    <i
+                      class="fas fa-star text-3xl peer-checked:text-accent-500 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-xs mt-1 peer-checked:text-accent-600 font-semibold">Regular</span>
+                  </label>
+                  <label
+                    class="flex flex-col items-center cursor-pointer text-gray-400 hover:text-accent-500 transition-colors group">
+                    <input type="radio" name="rating" value="3" class="sr-only peer">
+                    <i
+                      class="fas fa-star text-3xl peer-checked:text-accent-500 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-xs mt-1 peer-checked:text-accent-600 font-semibold">Buena</span>
+                  </label>
+                  <label
+                    class="flex flex-col items-center cursor-pointer text-gray-400 hover:text-accent-500 transition-colors group">
+                    <input type="radio" name="rating" value="4" class="sr-only peer">
+                    <i
+                      class="fas fa-star text-3xl peer-checked:text-accent-500 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-xs mt-1 peer-checked:text-accent-600 font-semibold">Muy Buena</span>
+                  </label>
+                  <label
+                    class="flex flex-col items-center cursor-pointer text-gray-400 hover:text-accent-500 transition-colors group">
+                    <input type="radio" name="rating" value="5" class="sr-only peer">
+                    <i
+                      class="fas fa-star text-3xl peer-checked:text-accent-500 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-xs mt-1 peer-checked:text-accent-600 font-semibold">Excelente</span>
+                  </label>
+                </div>
+              </div>
+              <div class="mb-4">
+                <label for="survey-problem" class="block text-sm font-medium text-gray-700 mb-1">¿Qué problemática
+                  principal enfrentas hoy como joven?</label>
+                <textarea id="survey-problem" rows="3" class="form-input"
+                  placeholder="Ej: Falta de espacios para estudiar, inseguridad, estrés..."></textarea>
+              </div>
+              <div>
+                <label for="survey-suggestion" class="block text-sm font-medium text-gray-700 mb-1">Sugerencias para
+                  mejorar</label>
+                <textarea id="survey-suggestion" rows="3" class="form-input"
+                  placeholder="Tus ideas son bienvenidas..."></textarea>
+              </div>
+            </div>
+            <div class="text-center pt-4">
+              <div id="survey-status" class="hidden mb-4 p-3 rounded-lg text-sm"></div>
+              <button type="submit" class="btn btn-primary w-full md:w-auto px-12 py-3 text-lg requires-auth">
+                Enviar Encuesta
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+      <section id="contacto" class="py-20 px-6 bg-light-bg">
+        <div class="container mx-auto max-w-7xl">
+          <i class="fas fa-map-marker-alt text-4xl text-primary-500 text-center w-full block mb-4"></i>
+          <h2 class="section-title">Contáctanos y Ubícanos</h2>
+          <p class="section-subtitle">¿Tienes preguntas? Escríbenos. También puedes visitarnos en nuestra oficina.</p>
+          <div class="grid md:grid-cols-2 gap-10">
+            <div>
+              <h3 class="text-2xl font-semibold mb-6">Envíanos un mensaje</h3>
+              <form id="contact-form" class="space-y-6">
+                <div id="contact-status" class="hidden p-4 rounded-lg"></div>
+                <div>
+                  <label for="contact-message" class="block text-sm font-medium text-gray-700 mb-1">Mensaje</label>
+                  <textarea id="contact-message" rows="5" class="form-input"></textarea>
+                </div>
+                <div>
+                  <button type="submit" class="btn btn-secondary w-full py-3 requires-auth">Enviar Mensaje</button>
+                </div>
+              </form>
+            </div>
+            <div>
+              <h3 class="text-2xl font-semibold mb-6">Nuestra Ubicación</h3>
+              <div class="space-y-4 text-lg text-gray-600">
+                <p><i class="fas fa-map-marker-alt w-6 text-center mr-2 text-primary-500"></i>HERRERA 360 (Centro
+                  Comunitario Santiago en Compañía)</p>
+                <p><i class="fas fa-clock w-6 text-center mr-2 text-primary-500"></i>Lunes a jueves [09:00 - 18:00 hrs]
+                  viernes [09:00 a 17:00 hrs]</p>
+                <p><i class="fas fa-envelope w-6 text-center mr-2 text-primary-500"></i>stgojoven@munistgo.cl</p>
+              </div>
+              <div class="mt-6 rounded-lg overflow-hidden shadow-lg h-64 md:h-96 w-full">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d208.08130025488833!2d-70.67761944700538!3d-33.441468809849376!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses-419!2scl!4v1763749704959!5m2!1ses-419!2scl"
+                  width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ==================== PIE DE PÁGINA ==================== -->
+    <footer class="bg-gray-800 text-gray-300 py-12 px-6">
+      <div class="container mx-auto max-w-7xl text-center">
+        <h3 class="text-2xl font-bold text-white mb-4">Apoyo Joven</h3>
+        <p class="mb-6">Crece, participa y aprende.</p>
+        <div class="flex justify-center space-x-6 text-2xl mb-8">
+          <a href="https://www.instagram.com/stgojoven?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+            target="_blank" rel="noopener noreferrer" class="hover:text-accent-500 transition-colors">
+            <i class="fab fa-instagram"></i>
+          </a>
+        </div>
+        <div class="border-t border-gray-700 pt-6 text-sm text-gray-500">
+          &copy; 2025 Apoyo Joven. Todos los derechos reservados.
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="../js/main.js"></script>
+</body>
+
+</html>

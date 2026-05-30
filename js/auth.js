@@ -100,6 +100,8 @@ export const initAuth = () => {
             // Ocultar botón admin y papeleras
             const adminBtn = document.getElementById('admin-add-event-btn');
             if (adminBtn) adminBtn.classList.add('hidden');
+            const dashboardBtn = document.getElementById('admin-dashboard-btn');
+            if (dashboardBtn) dashboardBtn.classList.add('hidden');
             
             document.querySelectorAll('.admin-delete-btn').forEach(btn => {
                 btn.classList.add('hidden');
@@ -182,8 +184,10 @@ export const initAuth = () => {
 
                     // Mostrar botón admin y papeleras si corresponde
                     const adminBtn = document.getElementById('admin-add-event-btn');
+                    const dashboardBtn = document.getElementById('admin-dashboard-btn');
                     if (userRole === 'admin') {
                         if (adminBtn) adminBtn.classList.remove('hidden');
+                        if (dashboardBtn) dashboardBtn.classList.remove('hidden');
                         document.querySelectorAll('.admin-delete-btn').forEach(btn => {
                             btn.classList.remove('hidden');
                         });

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Administrador - Apoyo Joven</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'sans': ['Poppins', 'sans-serif'],
+          },
+          colors: {
+            'primary': {
+              '500': '#0ea5e9',
+              '600': '#0284c7',
+            },
+            'secondary': {
+              '500': '#10b981',
+              '600': '#059669',
+            },
+            'accent': {
+              '500': '#f97316',
+              '600': '#ea580c',
+            },
+            'light-bg': '#f8fafc',
+          }
+        }
+      }
+    }
+  </script>
+  <link href="../css/styles.css" rel="stylesheet">
+  <link href="../css/dashboard.css" rel="stylesheet">
+</head>
+
+<body class="bg-light-bg text-gray-700 font-sans antialiased dashboard-container flex">
+  
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar w-64 bg-white border-r border-gray-200 hidden md:flex flex-col h-screen sticky top-0">
+    <div class="p-6 border-b border-gray-200">
+      <h2 class="text-2xl font-bold text-primary-500">Panel Admin</h2>
+    </div>
+    <nav class="flex-1 p-4 space-y-2">
+      <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 bg-primary-50 text-primary-600 rounded-lg font-semibold">
+        <i class="fas fa-chart-pie"></i> Resumen
+      </a>
+      <a href="dashboard-usuarios.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-users"></i> Usuarios
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-calendar-alt"></i> Calendario
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-bullhorn"></i> Programas
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-cog"></i> Configuración
+      </a>
+    </nav>
+    <div class="p-4 border-t border-gray-200">
+      <a href="../index.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors">
+        <i class="fas fa-sign-out-alt"></i> Volver a la Web
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col min-h-screen">
+    
+    <!-- Top Header -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
+      <div class="px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+          <button class="md:hidden text-gray-500 hover:text-primary-500 text-xl">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h1 class="text-xl font-semibold text-gray-800">Vista General</h1>
+        </div>
+        <div class="flex items-center gap-4">
+          <button class="text-gray-500 hover:text-primary-500 transition-colors p-2 rounded-full hover:bg-gray-100 relative">
+            <i class="fas fa-bell"></i>
+            <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+          </button>
+          <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
+            <div class="text-right hidden sm:block">
+              <p class="text-sm font-semibold text-gray-800">Admin</p>
+              <p class="text-xs text-gray-500">Oficina de Juventud</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-primary-500 text-white flex items-center justify-center font-bold">
+              A
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard Content Mockup -->
+    <div class="p-6 md:p-8 flex-1">
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">¡Hola, Administrador!</h2>
+        <p class="text-gray-600">Aquí tienes un resumen de la actividad reciente de la plataforma.</p>
+      </div>
+
+      <!-- Overview Cards Row 1: Users & Surveys -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        
+        <!-- Metrics: Total & Growth -->
+        <div class="bg-white rounded-xl p-6 border border-gray-100 dashboard-card col-span-1 lg:col-span-2 flex flex-col justify-between">
+          <div class="flex flex-col sm:flex-row justify-between items-start mb-6 gap-4">
+            <div>
+              <h3 class="text-lg font-bold text-gray-800">Métricas de Usuarios</h3>
+              <p class="text-sm text-gray-500">Resumen de registros y crecimiento</p>
+            </div>
+            <select class="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block p-2 outline-none">
+              <option>Último mes</option>
+              <option>Última semana</option>
+              <option>Último día</option>
+            </select>
+          </div>
+          <div class="flex gap-8">
+            <div>
+              <p class="text-sm text-gray-500 font-medium mb-1">Total Registros</p>
+              <p class="text-4xl font-bold text-primary-500">1,248</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 font-medium mb-1">Crecimiento Reciente</p>
+              <p class="text-4xl font-bold text-secondary-500">+42 <span class="text-sm font-normal text-gray-400">nuevos</span></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Surveys: Rating & Top Interest -->
+        <div class="bg-white rounded-xl p-6 border border-gray-100 dashboard-card col-span-1 flex flex-col justify-between">
+          <div class="mb-4">
+            <h3 class="text-lg font-bold text-gray-800">Tu Opinión Cuenta</h3>
+            <p class="text-sm text-gray-500">Actualizado esta semana</p>
+          </div>
+          <div class="mb-4">
+            <p class="text-sm text-gray-500 font-medium mb-1">Promedio de Calificación</p>
+            <div class="flex items-center gap-2">
+              <p class="text-3xl font-bold text-yellow-500">4.8</p>
+              <div class="text-yellow-400 text-lg">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500 font-medium mb-1">Tema de Mayor Interés</p>
+            <p class="text-lg font-semibold text-accent-500"><i class="fas fa-heart-pulse mr-2"></i>Salud Mental</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: Demographics Graph & Upcoming Events -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Demographics 1:1 Square Graph -->
+        <div class="bg-white rounded-xl p-6 border border-gray-100 dashboard-card col-span-1 aspect-square flex flex-col">
+          <div class="mb-4">
+            <h3 class="text-lg font-bold text-gray-800">Demografía</h3>
+            <p class="text-sm text-gray-500">Distribución por rango de edad</p>
+          </div>
+          <div class="flex-1 flex items-end justify-around gap-2 pt-6">
+            <!-- Mockup Bar Chart -->
+            <div class="w-1/3 flex flex-col items-center gap-2 h-full justify-end">
+              <div class="w-full bg-secondary-500 rounded-t-sm h-[30%] relative opacity-80 hover:opacity-100 transition-opacity">
+                <div class="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-secondary-600">30%</div>
+              </div>
+              <p class="text-xs text-gray-500 font-medium whitespace-nowrap">14-17</p>
+            </div>
+            <div class="w-1/3 flex flex-col items-center gap-2 h-full justify-end">
+              <div class="w-full bg-primary-500 rounded-t-sm h-[55%] relative opacity-90 hover:opacity-100 transition-opacity">
+                <div class="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-primary-600">55%</div>
+              </div>
+              <p class="text-xs text-gray-700 font-bold whitespace-nowrap">18-24</p>
+            </div>
+            <div class="w-1/3 flex flex-col items-center gap-2 h-full justify-end">
+              <div class="w-full bg-accent-500 rounded-t-sm h-[15%] relative opacity-80 hover:opacity-100 transition-opacity">
+                <div class="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-accent-600">15%</div>
+              </div>
+              <p class="text-xs text-gray-500 font-medium whitespace-nowrap">25-29</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Events -->
+        <div class="bg-white rounded-xl p-6 border border-gray-100 dashboard-card col-span-1 lg:col-span-2 flex flex-col">
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <h3 class="text-lg font-bold text-gray-800">Próximas Actividades</h3>
+              <p class="text-sm text-gray-500">Las 3 actividades más cercanas</p>
+            </div>
+            <a href="#" class="text-sm text-primary-500 font-semibold hover:underline hidden sm:block">Ver calendario</a>
+          </div>
+          
+          <div class="space-y-4 flex-1 flex flex-col justify-center">
+            <!-- Event 1 -->
+            <div class="flex items-center gap-4 p-3 rounded-lg border border-gray-50 hover:bg-gray-50 transition-colors">
+              <div class="w-14 h-14 rounded-lg bg-blue-100 text-blue-600 flex flex-col items-center justify-center flex-shrink-0">
+                <span class="text-xs font-bold uppercase">Nov</span>
+                <span class="text-xl font-bold">10</span>
+              </div>
+              <div class="flex-1">
+                <h4 class="font-semibold text-gray-800 line-clamp-1">Feria Vocacional 2025</h4>
+                <p class="text-sm text-gray-500"><i class="fas fa-store mr-1"></i>Feria</p>
+              </div>
+              <div class="hidden sm:block">
+                <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">Faltan 12 días</span>
+              </div>
+            </div>
+            
+            <!-- Event 2 -->
+            <div class="flex items-center gap-4 p-3 rounded-lg border border-gray-50 hover:bg-gray-50 transition-colors">
+              <div class="w-14 h-14 rounded-lg bg-yellow-100 text-yellow-600 flex flex-col items-center justify-center flex-shrink-0">
+                <span class="text-xs font-bold uppercase">Nov</span>
+                <span class="text-xl font-bold">14</span>
+              </div>
+              <div class="flex-1">
+                <h4 class="font-semibold text-gray-800 line-clamp-1">Taller de Liderazgo Juvenil</h4>
+                <p class="text-sm text-gray-500"><i class="fas fa-chalkboard-teacher mr-1"></i>Taller</p>
+              </div>
+              <div class="hidden sm:block">
+                <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">Faltan 16 días</span>
+              </div>
+            </div>
+
+            <!-- Event 3 -->
+            <div class="flex items-center gap-4 p-3 rounded-lg border border-gray-50 hover:bg-gray-50 transition-colors">
+              <div class="w-14 h-14 rounded-lg bg-green-100 text-green-600 flex flex-col items-center justify-center flex-shrink-0">
+                <span class="text-xs font-bold uppercase">Nov</span>
+                <span class="text-xl font-bold">20</span>
+              </div>
+              <div class="flex-1">
+                <h4 class="font-semibold text-gray-800 line-clamp-1">Inicio Curso de IA</h4>
+                <p class="text-sm text-gray-500"><i class="fas fa-laptop-code mr-1"></i>Curso</p>
+              </div>
+              <div class="hidden sm:block">
+                <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">Faltan 22 días</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
+    </div>
+  </main>
+
+</body>
+</html>
