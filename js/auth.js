@@ -1,4 +1,4 @@
-import { API_CONFIG } from './api.js';
+import { supabase } from './api.js';
 import { showStatusMessage } from './utils.js';
 
 export let currentUser = null;
@@ -83,9 +83,10 @@ export const initAuth = () => {
     };
 
     // Funciones de Login y Logout
-    const handleLoginBtnClick = (e) => {
+    const handleLoginBtnClick = async (e) => {
         if (currentUser) {
             // Logout logic
+            await supabase.auth.signOut();
             currentUser = null;
             currentUserEmail = null;
             userRole = null;
@@ -148,33 +149,22 @@ export const initAuth = () => {
             showStatusMessage(statusDiv, 'procesando solicitud', true);
 
             try {
-                let resultado, respuestaOk;
-                let esAdminMock = email === 'admin@muni.cl';
-                let esUserMock = email === 'user@muni.cl';
-                
-                if (esAdminMock || esUserMock) {
-                    resultado = { 
-                        usuario: esAdminMock ? 'Administrador' : 'Usuario Prueba', 
-                        rol: esAdminMock ? 'admin' : 'comun' 
-                    };
-                    respuestaOk = true;
-                } else {
-                    const respuesta = await fetch(`${API_CONFIG.urlBase}${API_CONFIG.endpoints.login}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ Email: email, Password: password })
-                    });
-                    resultado = await respuesta.json();
-                    respuestaOk = respuesta.ok;
-                }
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
 
-                if (respuestaOk) {
-                    showStatusMessage(statusDiv, `acceso concedido usuario ${resultado.usuario}`, true);
+                if (!error && data.user) {
+                    const nombreUsuario = data.user.user_metadata?.nombre || data.user.email.split('@')[0];
+                    showStatusMessage(statusDiv, `acceso concedido usuario ${nombreUsuario}`, true);
 
                     // Set global state
-                    currentUser = resultado.usuario;
+                    currentUser = nombreUsuario;
                     currentUserEmail = email;
-                    userRole = esAdminMock ? 'admin' : (resultado.rol || 'comun');
+                    
+                    // Asignar rol admin al correo admin@muni.cl de manera sencilla (o en metadata)
+                    let esAdmin = email === 'admin@muni.cl';
+                    userRole = esAdmin ? 'admin' : 'comun';
 
                     // Mostrar botón de dashboard si corresponde
                     const dashboardBtn = document.getElementById('admin-dashboard-btn');
@@ -198,7 +188,7 @@ export const initAuth = () => {
                     }, 2000);
 
                 } else {
-                    showStatusMessage(statusDiv, resultado.error || 'Error de credenciales', false);
+                    showStatusMessage(statusDiv, error.message || 'Error de credenciales', false);
                 }
             } catch (error) {
                 console.error(error);
@@ -238,15 +228,26 @@ export const initAuth = () => {
             showStatusMessage(statusDiv, 'procesando registro', true);
 
             try {
-                const respuesta = await fetch(`${API_CONFIG.urlBase}${API_CONFIG.endpoints.register}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(datos)
+                const { data, error } = await supabase.auth.signUp({
+                    email: datos.Email,
+                    password: datos.Password,
+                    options: {
+                        data: {
+                            rut: datos.Rut,
+                            nombre: datos.Nombre,
+                            apellido: datos.Apellido,
+                            telefono: datos.Telefono,
+                            fecha_nacimiento: datos.FechaNacimiento,
+                            genero: datos.Genero,
+                            genero_otro: datos.GeneroOtro
+                        }
+                    }
                 });
 
-                const resultado = await respuesta.json();
-
-                if (respuesta.ok) {
+                if (!error) {
+                    // Opcionalmente podemos insertar en una tabla pública 'perfiles' si fuese necesario.
+                    // await supabase.from('perfiles').insert({ id: data.user.id, rut: datos.Rut, ... });
+                    
                     showStatusMessage(statusDiv, 'registro exitoso', true);
                     registerForm.reset();
 
@@ -255,7 +256,7 @@ export const initAuth = () => {
                         statusDiv.classList.add('hidden');
                     }, 2000);
                 } else {
-                    showStatusMessage(statusDiv, 'error ' + resultado.error, false);
+                    showStatusMessage(statusDiv, 'error: ' + error.message, false);
                 }
             } catch (error) {
                 console.error(error);

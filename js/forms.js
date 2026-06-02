@@ -1,4 +1,4 @@
-import { API_CONFIG } from './api.js';
+import { supabase } from './api.js';
 import { showStatusMessage } from './utils.js';
 import { currentUser, currentUserEmail, requireAuth } from './auth.js';
 
@@ -55,20 +55,23 @@ export const initForms = () => {
             };
 
             try {
-                const respuesta = await fetch(`${API_CONFIG.urlBase}${API_CONFIG.endpoints.survey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(datosEncuesta)
-                });
+                const { error } = await supabase.from('encuestas').insert([{
+                    rango_edad: edad,
+                    ocupacion: ocupacion,
+                    ocupacion_otro: ocupacionOtra,
+                    intereses: interesesMarcados,
+                    calificacion: rating,
+                    problematica: problema,
+                    sugerencia: sugerencia
+                }]);
 
-                if (respuesta.ok) {
+                if (!error) {
                     showStatusMessage(statusDiv, 'operacion exitosa', true);
                     surveyForm.reset();
                     if (occupationOtherWrapper) occupationOtherWrapper.classList.add('hidden');
                     document.querySelectorAll('input[name="rating"]').forEach(r => r.checked = false);
                 } else {
-                    const errorData = await respuesta.json();
-                    showStatusMessage(statusDiv, 'error ' + errorData.error, false);
+                    showStatusMessage(statusDiv, 'error ' + error.message, false);
                 }
             } catch (error) {
                 console.error(error);
@@ -87,27 +90,21 @@ export const initForms = () => {
             const message = document.getElementById('contact-message').value;
 
             const datosParaEnviar = {
-                Name: currentUser || 'Usuario Logueado',
-                Email: currentUserEmail || 'correo@ejemplo.com',
-                Message: message
+                nombre: currentUser || 'Usuario Logueado',
+                email: currentUserEmail || 'correo@ejemplo.com',
+                mensaje: message
             };
             const statusDiv = document.getElementById('contact-status');
             showStatusMessage(statusDiv, 'procesando solicitud', true);
 
             try {
-                const respuesta = await fetch(`${API_CONFIG.urlBase}${API_CONFIG.endpoints.contact}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(datosParaEnviar)
-                });
+                const { error } = await supabase.from('contacto').insert([datosParaEnviar]);
 
-                if (respuesta.ok) {
+                if (!error) {
                     showStatusMessage(statusDiv, 'mensaje enviado', true);
                     contactForm.reset();
                 } else {
-                    showStatusMessage(statusDiv, 'error en el envio', false);
+                    showStatusMessage(statusDiv, 'error en el envio: ' + error.message, false);
                 }
 
             } catch (error) {
@@ -178,16 +175,15 @@ export const initForms = () => {
             showStatusMessage(enrollStatus, 'Procesando inscripción...', true);
             
             const payload = {
-                Nombre: currentUser || 'Usuario Logueado',
-                Email: currentUserEmail || 'correo@ejemplo.com',
-                Actividad: currentEnrollTitle
+                nombre: currentUser || 'Usuario Logueado',
+                email: currentUserEmail || 'correo@ejemplo.com',
+                actividad: currentEnrollTitle
             };
 
             try {
-                // Mock local exitoso
-                const respuestaOk = true; 
+                const { error } = await supabase.from('inscripciones').insert([payload]);
 
-                if (respuestaOk) {
+                if (!error) {
                     showStatusMessage(enrollStatus, '¡Inscripción confirmada! Te hemos enviado un correo.', true);
                     
                     setTimeout(() => {
@@ -196,7 +192,7 @@ export const initForms = () => {
                     }, 2500);
 
                 } else {
-                    showStatusMessage(enrollStatus, 'Error al inscribir', false);
+                    showStatusMessage(enrollStatus, 'Error al inscribir: ' + error.message, false);
                 }
             } catch (error) {
                 console.error(error);
