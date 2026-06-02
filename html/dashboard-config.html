@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuración - Apoyo Joven</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'sans': ['Poppins', 'sans-serif'],
+          },
+          colors: {
+            'primary': {
+              '50': '#f0f9ff',
+              '500': '#0ea5e9',
+              '600': '#0284c7',
+            },
+            'secondary': {
+              '500': '#10b981',
+              '600': '#059669',
+            },
+            'accent': {
+              '500': '#f97316',
+              '600': '#ea580c',
+            },
+            'light-bg': '#f8fafc',
+          }
+        }
+      }
+    }
+  </script>
+  <link href="../css/styles.css" rel="stylesheet">
+  <link href="../css/dashboard.css" rel="stylesheet">
+</head>
+
+<body class="bg-light-bg text-gray-700 font-sans antialiased dashboard-container flex">
+  
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar w-64 bg-white border-r border-gray-200 hidden md:flex flex-col h-screen sticky top-0">
+    <div class="p-6 border-b border-gray-200">
+      <h2 class="text-2xl font-bold text-primary-500">Panel Admin</h2>
+    </div>
+    <nav class="flex-1 p-4 space-y-2">
+      <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-chart-pie"></i> Resumen
+      </a>
+      <a href="dashboard-usuarios.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-users"></i> Usuarios
+      </a>
+      <a href="dashboard-calendario.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-calendar-alt"></i> Calendario
+      </a>
+      <a href="dashboard-programas.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-bullhorn"></i> Programas
+      </a>
+      <a href="dashboard-config.html" class="flex items-center gap-3 px-4 py-3 bg-primary-50 text-primary-600 rounded-lg font-semibold">
+        <i class="fas fa-cog"></i> Configuración
+      </a>
+    </nav>
+    <div class="p-4 border-t border-gray-200">
+      <a href="index.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors">
+        <i class="fas fa-sign-out-alt"></i> Volver a la Web
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col min-h-screen overflow-x-hidden">
+    
+    <!-- Top Header -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
+      <div class="px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+          <button class="md:hidden text-gray-500 hover:text-primary-500 text-xl">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h1 class="text-xl font-semibold text-gray-800">Configuración</h1>
+        </div>
+        <div class="flex items-center gap-4">
+          <button class="text-gray-500 hover:text-primary-500 transition-colors p-2 rounded-full hover:bg-gray-100 relative">
+            <i class="fas fa-bell"></i>
+          </button>
+          <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
+            <div class="text-right hidden sm:block">
+              <p class="text-sm font-semibold text-gray-800">Admin</p>
+              <p class="text-xs text-gray-500">Oficina de Juventud</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-primary-500 text-white flex items-center justify-center font-bold">
+              A
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <div class="p-6 md:p-8 flex-1">
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-1">Configuración del Sitio</h2>
+        <p class="text-gray-600">Administra la información general, redes sociales y cuenta de administrador.</p>
+      </div>
+
+      <!-- Status message -->
+      <div id="config-status" class="hidden mb-6 p-4 rounded-xl text-sm font-medium flex items-center gap-3"></div>
+
+      <div class="space-y-6">
+
+        <!-- Información General -->
+        <div class="bg-white rounded-xl border border-gray-100 overflow-hidden dashboard-card">
+          <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-100 text-primary-600 flex items-center justify-center">
+              <i class="fas fa-info-circle"></i>
+            </div>
+            <h3 class="text-base font-bold text-gray-800">Información General</h3>
+          </div>
+          <div class="p-6 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="site-name" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Sitio</label>
+                <input type="text" id="site-name" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" value="Apoyo Joven">
+              </div>
+              <div>
+                <label for="site-email" class="block text-sm font-medium text-gray-700 mb-1">Correo de Contacto</label>
+                <input type="email" id="site-email" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" value="stgojoven@munistgo.cl">
+              </div>
+            </div>
+            <div>
+              <label for="site-description" class="block text-sm font-medium text-gray-700 mb-1">Descripción del Sitio</label>
+              <textarea id="site-description" rows="2" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors">Tu espacio para encontrar orientación, capacitarte en nuevas habilidades y conectar con tu comunidad.</textarea>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="site-address" class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                <input type="text" id="site-address" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" value="HERRERA 360 (Centro Comunitario Santiago en Compañía)">
+              </div>
+              <div>
+                <label for="site-hours" class="block text-sm font-medium text-gray-700 mb-1">Horario de Atención</label>
+                <input type="text" id="site-hours" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" value="Lunes a jueves 09:00-18:00 / Viernes 09:00-17:00">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Redes Sociales -->
+        <div class="bg-white rounded-xl border border-gray-100 overflow-hidden dashboard-card">
+          <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-pink-100 text-pink-600 flex items-center justify-center">
+              <i class="fas fa-share-alt"></i>
+            </div>
+            <h3 class="text-base font-bold text-gray-800">Redes Sociales</h3>
+          </div>
+          <div class="p-6 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="social-instagram" class="block text-sm font-medium text-gray-700 mb-1">
+                  <i class="fab fa-instagram mr-1 text-pink-500"></i>Instagram
+                </label>
+                <input type="url" id="social-instagram" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" value="https://www.instagram.com/stgojoven" placeholder="https://instagram.com/...">
+              </div>
+              <div>
+                <label for="social-facebook" class="block text-sm font-medium text-gray-700 mb-1">
+                  <i class="fab fa-facebook mr-1 text-blue-600"></i>Facebook
+                </label>
+                <input type="url" id="social-facebook" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" value="" placeholder="https://facebook.com/...">
+              </div>
+              <div>
+                <label for="social-twitter" class="block text-sm font-medium text-gray-700 mb-1">
+                  <i class="fab fa-x-twitter mr-1 text-gray-800"></i>X (Twitter)
+                </label>
+                <input type="url" id="social-twitter" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" value="" placeholder="https://x.com/...">
+              </div>
+              <div>
+                <label for="social-tiktok" class="block text-sm font-medium text-gray-700 mb-1">
+                  <i class="fab fa-tiktok mr-1 text-gray-800"></i>TikTok
+                </label>
+                <input type="url" id="social-tiktok" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" value="" placeholder="https://tiktok.com/@...">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cuenta Administrador -->
+        <div class="bg-white rounded-xl border border-gray-100 overflow-hidden dashboard-card">
+          <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
+              <i class="fas fa-user-shield"></i>
+            </div>
+            <h3 class="text-base font-bold text-gray-800">Cuenta Administrador</h3>
+          </div>
+          <div class="p-6 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="admin-name" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                <input type="text" id="admin-name" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" value="Administrador">
+              </div>
+              <div>
+                <label for="admin-email" class="block text-sm font-medium text-gray-700 mb-1">Correo</label>
+                <input type="email" id="admin-email" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" value="admin@muni.cl">
+              </div>
+            </div>
+            <div class="border-t border-gray-100 pt-4">
+              <h4 class="text-sm font-semibold text-gray-700 mb-3">Cambiar Contraseña</h4>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label for="current-password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña Actual</label>
+                  <input type="password" id="current-password" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" placeholder="••••••••">
+                </div>
+                <div>
+                  <label for="new-password" class="block text-sm font-medium text-gray-700 mb-1">Nueva Contraseña</label>
+                  <input type="password" id="new-password" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" placeholder="••••••••">
+                </div>
+                <div>
+                  <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirmar Contraseña</label>
+                  <input type="password" id="confirm-password" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" placeholder="••••••••">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="flex justify-end gap-3 pt-2">
+          <button id="reset-btn" class="px-6 py-2.5 text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors font-medium">
+            <i class="fas fa-undo mr-2"></i>Restablecer
+          </button>
+          <button id="save-btn" class="px-6 py-2.5 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors font-medium shadow-sm shadow-primary-500/30">
+            <i class="fas fa-save mr-2"></i>Guardar Cambios
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/dashboard-config.js"></script>
+</body>
+</html>

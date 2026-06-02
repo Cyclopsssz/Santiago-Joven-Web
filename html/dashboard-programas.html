@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Programas - Apoyo Joven</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'sans': ['Poppins', 'sans-serif'],
+          },
+          colors: {
+            'primary': {
+              '50': '#f0f9ff',
+              '500': '#0ea5e9',
+              '600': '#0284c7',
+            },
+            'secondary': {
+              '500': '#10b981',
+              '600': '#059669',
+            },
+            'accent': {
+              '500': '#f97316',
+              '600': '#ea580c',
+            },
+            'light-bg': '#f8fafc',
+          }
+        }
+      }
+    }
+  </script>
+  <link href="../css/styles.css" rel="stylesheet">
+  <link href="../css/dashboard.css" rel="stylesheet">
+</head>
+
+<body class="bg-light-bg text-gray-700 font-sans antialiased dashboard-container flex">
+  
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar w-64 bg-white border-r border-gray-200 hidden md:flex flex-col h-screen sticky top-0">
+    <div class="p-6 border-b border-gray-200">
+      <h2 class="text-2xl font-bold text-primary-500">Panel Admin</h2>
+    </div>
+    <nav class="flex-1 p-4 space-y-2">
+      <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-chart-pie"></i> Resumen
+      </a>
+      <a href="dashboard-usuarios.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-users"></i> Usuarios
+      </a>
+      <a href="dashboard-calendario.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-calendar-alt"></i> Calendario
+      </a>
+      <a href="dashboard-programas.html" class="flex items-center gap-3 px-4 py-3 bg-primary-50 text-primary-600 rounded-lg font-semibold">
+        <i class="fas fa-bullhorn"></i> Programas
+      </a>
+      <a href="dashboard-config.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-cog"></i> Configuración
+      </a>
+    </nav>
+    <div class="p-4 border-t border-gray-200">
+      <a href="index.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors">
+        <i class="fas fa-sign-out-alt"></i> Volver a la Web
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col min-h-screen overflow-x-hidden">
+    
+    <!-- Top Header -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
+      <div class="px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+          <button class="md:hidden text-gray-500 hover:text-primary-500 text-xl">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h1 class="text-xl font-semibold text-gray-800">Programas Institucionales</h1>
+        </div>
+        <div class="flex items-center gap-4">
+          <button class="text-gray-500 hover:text-primary-500 transition-colors p-2 rounded-full hover:bg-gray-100 relative">
+            <i class="fas fa-bell"></i>
+          </button>
+          <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
+            <div class="text-right hidden sm:block">
+              <p class="text-sm font-semibold text-gray-800">Admin</p>
+              <p class="text-xs text-gray-500">Oficina de Juventud</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-primary-500 text-white flex items-center justify-center font-bold">
+              A
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <div class="p-6 md:p-8 flex-1">
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-1">Gestión de Programas</h2>
+        <p class="text-gray-600">Visualiza el estado y métricas de los programas activos de la Oficina de Juventud.</p>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-xl p-5 border border-gray-100 dashboard-card">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm text-gray-500 font-medium">Programas Activos</span>
+            <div class="w-10 h-10 rounded-lg bg-green-100 text-green-600 flex items-center justify-center">
+              <i class="fas fa-check-circle"></i>
+            </div>
+          </div>
+          <p class="text-3xl font-bold text-gray-800" id="active-count">0</p>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100 dashboard-card">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm text-gray-500 font-medium">Total Inscritos</span>
+            <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+              <i class="fas fa-user-plus"></i>
+            </div>
+          </div>
+          <p class="text-3xl font-bold text-gray-800" id="total-enrolled">0</p>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100 dashboard-card">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm text-gray-500 font-medium">Sesiones Realizadas</span>
+            <div class="w-10 h-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
+              <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+          </div>
+          <p class="text-3xl font-bold text-gray-800" id="total-sessions">0</p>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-gray-100 dashboard-card">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm text-gray-500 font-medium">Programas Pausados</span>
+            <div class="w-10 h-10 rounded-lg bg-yellow-100 text-yellow-600 flex items-center justify-center">
+              <i class="fas fa-pause-circle"></i>
+            </div>
+          </div>
+          <p class="text-3xl font-bold text-gray-800" id="paused-count">0</p>
+        </div>
+      </div>
+
+      <!-- Programs Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="programs-grid">
+        <!-- Rendered by JS -->
+      </div>
+      
+    </div>
+  </main>
+
+  <!-- Modal de Detalle de Programa -->
+  <div id="program-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <h3 id="program-modal-title" class="text-lg font-bold text-gray-800">Detalle del Programa</h3>
+        <button id="close-program-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="p-6">
+        <div id="program-modal-body" class="space-y-4">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+      <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+        <button id="close-program-modal-btn" class="px-4 py-2 text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors font-medium">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/dashboard-programas.js"></script>
+</body>
+</html>
