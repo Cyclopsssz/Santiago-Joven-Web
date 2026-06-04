@@ -162,9 +162,8 @@ export const initAuth = () => {
                     currentUser = nombreUsuario;
                     currentUserEmail = email;
                     
-                    // Asignar rol admin al correo admin@muni.cl de manera sencilla (o en metadata)
-                    let esAdmin = email === 'admin@muni.cl';
-                    userRole = esAdmin ? 'admin' : 'comun';
+                    // Asignar rol desde la base de datos (user_metadata)
+                    userRole = data.user.user_metadata?.role === 'admin' ? 'admin' : 'comun';
 
                     // Mostrar botón de dashboard si corresponde
                     const dashboardBtn = document.getElementById('admin-dashboard-btn');
@@ -239,7 +238,8 @@ export const initAuth = () => {
                             telefono: datos.Telefono,
                             fecha_nacimiento: datos.FechaNacimiento,
                             genero: datos.Genero,
-                            genero_otro: datos.GeneroOtro
+                            genero_otro: datos.GeneroOtro,
+                            role: 'comun'
                         }
                     }
                 });

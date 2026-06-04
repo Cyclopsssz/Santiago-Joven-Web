@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
   // ==================== DATA ====================
   const events = [
-    { id: 1, title: 'Feria Vocacional 2025', type: 'feria', date: '2025-11-10', active: true },
-    { id: 2, title: 'Taller de Liderazgo Juvenil', type: 'taller', date: '2025-11-14', active: true },
-    { id: 3, title: 'Inicio Curso de IA', type: 'curso', date: '2025-11-20', active: true },
-    { id: 4, title: 'Campaña Solidaria Navideña', type: 'campana', date: '2025-11-28', active: true },
-    { id: 5, title: 'Taller de Oratoria', type: 'taller', date: '2025-12-02', active: true },
-    { id: 6, title: 'Feria de Emprendimiento', type: 'feria', date: '2025-12-05', active: true },
+    { id: 1, title: 'Feria Vocacional 2025', type: 'feria', date: '2025-11-10', active: true, hasCupos: false, cupos: null },
+    { id: 2, title: 'Taller de Liderazgo Juvenil', type: 'taller', date: '2025-11-14', active: true, hasCupos: true, cupos: 30 },
+    { id: 3, title: 'Inicio Curso de IA', type: 'curso', date: '2025-11-20', active: true, hasCupos: true, cupos: 20 },
+    { id: 4, title: 'Campaña Solidaria Navideña', type: 'campana', date: '2025-11-28', active: true, hasCupos: false, cupos: null },
+    { id: 5, title: 'Taller de Oratoria', type: 'taller', date: '2025-12-02', active: true, hasCupos: true, cupos: 25 },
+    { id: 6, title: 'Feria de Emprendimiento', type: 'feria', date: '2025-12-05', active: true, hasCupos: false, cupos: null },
   ];
   let nextId = 7;
 
@@ -24,6 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const eventTitleInput = document.getElementById('event-title');
   const eventTypeInput = document.getElementById('event-type');
   const eventDateInput = document.getElementById('event-date');
+  const eventHasCupos = document.getElementById('event-has-cupos');
+  const eventCupos = document.getElementById('event-cupos');
+  const cuposContainer = document.getElementById('cupos-container');
   const eventEditId = document.getElementById('event-edit-id');
   const closeModalBtn = document.getElementById('close-modal-btn');
   const cancelModalBtn = document.getElementById('cancel-modal-btn');
@@ -130,6 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     eventModal.classList.add('hidden');
     eventForm.reset();
     eventEditId.value = '';
+    cuposContainer.classList.add('hidden');
     formStatus.classList.add('hidden');
     modalTitle.textContent = 'Añadir Evento';
     saveEventBtn.textContent = 'Guardar Evento';
@@ -160,7 +164,19 @@ document.addEventListener('DOMContentLoaded', () => {
   addEventBtn.addEventListener('click', () => {
     modalTitle.textContent = 'Añadir Evento';
     saveEventBtn.textContent = 'Guardar Evento';
+    cuposContainer.classList.add('hidden');
     openModal();
+  });
+
+  // Toggle cupos visibility
+  eventHasCupos.addEventListener('change', (e) => {
+    if (e.target.checked) {
+      cuposContainer.classList.remove('hidden');
+      eventCupos.required = true;
+    } else {
+      cuposContainer.classList.add('hidden');
+      eventCupos.required = false;
+    }
   });
 
   // Close modals
@@ -181,9 +197,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const title = eventTitleInput.value.trim();
     const type = eventTypeInput.value;
     const date = eventDateInput.value;
+    const hasCupos = eventHasCupos.checked;
+    const cupos = hasCupos ? parseInt(eventCupos.value) : null;
 
-    if (!title || !type || !date) {
-      showFormStatus('Por favor completa todos los campos', false);
+    if (!title || !type || !date || (hasCupos && !cupos)) {
+      showFormStatus('Por favor completa todos los campos requeridos', false);
       return;
     }
 
@@ -196,11 +214,13 @@ document.addEventListener('DOMContentLoaded', () => {
         ev.title = title;
         ev.type = type;
         ev.date = date;
+        ev.hasCupos = hasCupos;
+        ev.cupos = cupos;
       }
       showFormStatus('Evento actualizado exitosamente', true);
     } else {
       // Add new
-      events.push({ id: nextId++, title, type, date, active: true });
+      events.push({ id: nextId++, title, type, date, hasCupos, cupos, active: true });
       showFormStatus('Evento añadido exitosamente', true);
     }
 
@@ -236,6 +256,18 @@ document.addEventListener('DOMContentLoaded', () => {
       eventTypeInput.value = ev.type;
       eventDateInput.value = ev.date;
       eventEditId.value = ev.id;
+      
+      eventHasCupos.checked = !!ev.hasCupos;
+      if (ev.hasCupos) {
+        cuposContainer.classList.remove('hidden');
+        eventCupos.value = ev.cupos;
+        eventCupos.required = true;
+      } else {
+        cuposContainer.classList.add('hidden');
+        eventCupos.value = '';
+        eventCupos.required = false;
+      }
+      
       openModal();
     }
 
