@@ -412,50 +412,21 @@
           <div id="programas-lazos" class="mb-16 pt-20">
             <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 text-center"><i
                 class="fas fa-hands-holding-child text-secondary-500 mr-4"></i>Programa Lazos</h3>
-            <div class="card max-w-4xl mx-auto text-left">
-              <h4 class="text-xl font-semibold mb-4 text-secondary-600">Definición y Contexto</h4>
-              <p class="text-gray-600 mb-4">El Programa Lazos es una estrategia de intervención y prevención social del
-                Gobierno de Chile, específicamente de la Subsecretaría de Prevención del Delito (SPD), que es
-                implementado a nivel local por diversas municipalidades, incluida la de Santiago.</p>
-              <p class="text-gray-600 mb-6">En Santiago, la Oficina de la Juventud (OMJ) es una de las unidades que
-                colabora o ejecuta este programa.</p>
-              <h4 class="text-xl font-semibold mb-4 text-secondary-600">Objetivo Principal</h4>
-              <p class="text-gray-600 mb-6">El objetivo central del Programa Lazos es prevenir la delincuencia y las
-                conductas de riesgo en jóvenes. Busca intervenir tempranamente para evitar que los jóvenes que presentan
-                factores de riesgo o conductas transgresoras escalen hacia carreras delictivas.</p>
-              <h4 class="text-xl font-semibold mb-4 text-secondary-600">Población Objetivo</h4>
-              <p class="text-gray-600 mb-6">Está enfocado en niños, niñas y adolescentes (NNA), generalmente en un rango
-                de edad entre los 10 y 17 años, que presentan factores de riesgo socio-delictivo.</p>
-              <h4 class="text-xl font-semibold mb-4 text-secondary-600">Metodología de Intervención</h4>
-              <p class="text-gray-600 mb-4">Lazos no es un taller o una actividad puntual, sino una intervención
-                intensiva. Su metodología más conocida se basa en la Terapia Multisistémica (MST):</p>
-              <ul class="list-disc list-inside space-y-3 text-gray-600">
-                <li><strong>Enfoque Integral:</strong> En lugar de centrarse solo en el joven, la terapia involucra a
-                  todos los sistemas que lo rodean.</li>
-                <li><strong>Intervención Familiar:</strong> Se trabaja intensamente con la familia para entregarles
-                  herramientas de crianza y establecer límites.</li>
-                <li><strong>Entorno:</strong> También interviene en el entorno escolar y en el barrio.</li>
-              </ul>
+            <div class="card max-w-4xl mx-auto text-center flex flex-col items-center">
+              <p class="text-gray-600 mb-6 text-lg">Estrategia de intervención y prevención social orientada a prevenir conductas de riesgo en jóvenes y sus familias mediante un enfoque integral.</p>
+              <button class="btn btn-secondary px-8 py-3 w-auto open-modal-btn shadow-lg hover:shadow-secondary-500/30" data-modal="modal-lazos">
+                Ver más detalles
+              </button>
             </div>
           </div>
           <div id="programas-senda" class="mb-16 pt-20">
             <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 text-center"><i
                 class="fas fa-shield-heart text-accent-500 mr-4"></i>Programa Senda</h3>
-            <div class="card max-w-4xl mx-auto text-left">
-              <h4 class="text-xl font-semibold mb-4 text-accent-600">Definición y Contexto</h4>
-              <p class="text-gray-600 mb-6">El programa Senda inserto en la Oficina de la Juventud de Santiago es la
-                estrategia de prevención comunitaria del Servicio Nacional para la Prevención y Rehabilitación del
-                Consumo de Drogas y Alcohol (SENDA).</p>
-              <h4 class="text-xl font-semibold mb-4 text-accent-600">Objetivo Principal</h4>
-              <p class="text-gray-600 mb-6">El objetivo central es prevenir el consumo de alcohol y otras drogas en la
-                población, promoviendo estilos de vida saludables y fortaleciendo factores protectores.</p>
-              <h4 class="text-xl font-semibold mb-4 text-accent-600">Población Objetivo</h4>
-              <p class="text-gray-600 mb-6">Su foco principal son los niños, niñas, adolescentes y jóvenes que viven,
-                estudian o participan en la comuna de Santiago, así como sus familias y comunidades educativas.</p>
-              <h4 class="text-xl font-semibold mb-4 text-accent-600">Metodología de Intervención</h4>
-              <p class="text-gray-600 mb-4">La intervención se basa en un enfoque territorial, comunitario y de gestión
-                de redes. Incluye prevención en colegios, intervención comunitaria, coordinación de redes locales y
-                orientación/derivación de casos.</p>
+            <div class="card max-w-4xl mx-auto text-center flex flex-col items-center">
+              <p class="text-gray-600 mb-6 text-lg">Estrategia comunitaria para la prevención del consumo de alcohol y drogas, promoviendo estilos de vida saludables en Santiago.</p>
+              <button class="btn btn-accent px-8 py-3 w-auto open-modal-btn shadow-lg hover:shadow-accent-500/30" data-modal="modal-senda">
+                Ver más detalles
+              </button>
             </div>
           </div>
         </div>
@@ -795,8 +766,63 @@
     </footer>
   </div>
 
+  <!-- Modales de Programas -->
+  <div id="modal-lazos" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col transform scale-95 transition-transform duration-300 modal-content">
+      <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-secondary-50">
+        <h3 class="text-xl font-bold text-secondary-700 flex items-center gap-3"><i class="fas fa-hands-holding-child"></i> Programa Lazos</h3>
+        <button class="close-modal-btn text-gray-400 hover:text-gray-700 transition-colors bg-white w-8 h-8 rounded-full shadow-sm flex items-center justify-center">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="p-6 md:p-8 overflow-y-auto text-left">
+        <h4 class="text-xl font-semibold mb-3 text-secondary-600">Definición y Contexto</h4>
+        <p class="text-gray-600 mb-6">El Programa Lazos es una estrategia de intervención y prevención social del Gobierno de Chile, específicamente de la Subsecretaría de Prevención del Delito (SPD), que es implementado a nivel local por diversas municipalidades, incluida la de Santiago. En Santiago, la Oficina de la Juventud (OMJ) es una de las unidades que colabora o ejecuta este programa.</p>
+        
+        <h4 class="text-xl font-semibold mb-3 text-secondary-600">Objetivo Principal</h4>
+        <p class="text-gray-600 mb-6">El objetivo central del Programa Lazos es prevenir la delincuencia y las conductas de riesgo en jóvenes. Busca intervenir tempranamente para evitar que los jóvenes que presentan factores de riesgo o conductas transgresoras escalen hacia carreras delictivas.</p>
+        
+        <h4 class="text-xl font-semibold mb-3 text-secondary-600">Población Objetivo</h4>
+        <p class="text-gray-600 mb-6">Está enfocado en niños, niñas y adolescentes (NNA), generalmente en un rango de edad entre los 10 y 17 años, que presentan factores de riesgo socio-delictivo.</p>
+        
+        <h4 class="text-xl font-semibold mb-3 text-secondary-600">Metodología de Intervención</h4>
+        <p class="text-gray-600 mb-4">Lazos no es un taller o una actividad puntual, sino una intervención intensiva. Su metodología más conocida se basa en la Terapia Multisistémica (MST):</p>
+        <ul class="list-disc list-inside space-y-2 text-gray-600 mb-6">
+          <li><strong>Enfoque Integral:</strong> En lugar de centrarse solo en el joven, la terapia involucra a todos los sistemas que lo rodean.</li>
+          <li><strong>Intervención Familiar:</strong> Se trabaja intensamente con la familia para entregarles herramientas de crianza y establecer límites.</li>
+          <li><strong>Entorno:</strong> También interviene en el entorno escolar y en el barrio.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-senda" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col transform scale-95 transition-transform duration-300 modal-content">
+      <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-accent-50">
+        <h3 class="text-xl font-bold text-accent-700 flex items-center gap-3"><i class="fas fa-shield-heart"></i> Programa Senda</h3>
+        <button class="close-modal-btn text-gray-400 hover:text-gray-700 transition-colors bg-white w-8 h-8 rounded-full shadow-sm flex items-center justify-center">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="p-6 md:p-8 overflow-y-auto text-left">
+        <h4 class="text-xl font-semibold mb-3 text-accent-600">Definición y Contexto</h4>
+        <p class="text-gray-600 mb-6">El programa Senda inserto en la Oficina de la Juventud de Santiago es la estrategia de prevención comunitaria del Servicio Nacional para la Prevención y Rehabilitación del Consumo de Drogas y Alcohol (SENDA).</p>
+        
+        <h4 class="text-xl font-semibold mb-3 text-accent-600">Objetivo Principal</h4>
+        <p class="text-gray-600 mb-6">El objetivo central es prevenir el consumo de alcohol y otras drogas en la población, promoviendo estilos de vida saludables y fortaleciendo factores protectores.</p>
+        
+        <h4 class="text-xl font-semibold mb-3 text-accent-600">Población Objetivo</h4>
+        <p class="text-gray-600 mb-6">Su foco principal son los niños, niñas, adolescentes y jóvenes que viven, estudian o participan en la comuna de Santiago, así como sus familias y comunidades educativas.</p>
+        
+        <h4 class="text-xl font-semibold mb-3 text-accent-600">Metodología de Intervención</h4>
+        <p class="text-gray-600 mb-6">La intervención se basa en un enfoque territorial, comunitario y de gestión de redes. Incluye prevención en colegios, intervención comunitaria, coordinación de redes locales y orientación/derivación de casos.</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script type="module" src="../js/main.js"></script>
+  <script src="../js/programas.js"></script>
 </body>
 
 </html>
