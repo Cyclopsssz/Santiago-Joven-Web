@@ -56,10 +56,10 @@
       <a href="dashboard-calendario.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
         <i class="fas fa-calendar-alt"></i> Calendario
       </a>
-      <a href="dashboard-programas.html" class="flex items-center gap-3 px-4 py-3 bg-primary-50 text-primary-600 rounded-lg font-semibold">
+      <a href="dashboard-programas.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
         <i class="fas fa-bullhorn"></i> Programas
       </a>
-      <a href="dashboard-servicios.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+      <a href="dashboard-servicios.html" class="flex items-center gap-3 px-4 py-3 bg-primary-50 text-primary-600 rounded-lg font-semibold">
         <i class="fas fa-chalkboard-teacher"></i> Servicios
       </a>
       <a href="dashboard-accion-joven.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
@@ -89,7 +89,7 @@
           <button class="md:hidden text-gray-500 hover:text-primary-500 text-xl">
             <i class="fas fa-bars"></i>
           </button>
-          <h1 class="text-xl font-semibold text-gray-800">Programas Institucionales</h1>
+          <h1 class="text-xl font-semibold text-gray-800">Servicios, Cursos y Asesorías</h1>
         </div>
         <div class="flex items-center gap-4">
           <button class="text-gray-500 hover:text-primary-500 transition-colors p-2 rounded-full hover:bg-gray-100 relative">
@@ -112,12 +112,12 @@
     <div class="p-6 md:p-8 flex-1">
       <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-1">Gestión de Programas Institucionales</h2>
-          <p class="text-gray-600">Administra los programas gubernamentales (Senda, Lazos).</p>
+          <h2 class="text-2xl font-bold text-gray-800 mb-1">Gestión de Servicios y Cursos</h2>
+          <p class="text-gray-600">Administra los cursos, preuniversitarios y asesorías para jóvenes.</p>
         </div>
         <div class="flex gap-3">
-          <button id="add-programa-btn" class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium flex items-center gap-2">
-            <i class="fas fa-plus"></i> Nuevo Programa
+          <button id="add-servicio-btn" class="px-4 py-2 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 transition-colors font-medium flex items-center gap-2">
+            <i class="fas fa-plus"></i> Nuevo Servicio
           </button>
         </div>
       </div>
@@ -162,8 +162,14 @@
         </div>
       </div>
 
-      <!-- Programas Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12" id="programas-grid">
+      <!-- Servicios Grid -->
+      <div class="mb-4">
+        <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+          <i class="fas fa-chalkboard-teacher text-secondary-500"></i> Servicios, Cursos y Asesorías
+        </h3>
+        <p class="text-sm text-gray-500">Actividades formativas, académicas y servicios específicos para jóvenes.</p>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="servicios-grid">
         <!-- Rendered by JS -->
       </div>
       
@@ -190,53 +196,59 @@
     </div>
   </div>
 
-  <!-- Modal Formulario Programa -->
-  <div id="form-programa-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity">
+
+
+  <!-- Modal Formulario Servicio -->
+  <div id="form-servicio-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
       <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
-        <h3 id="form-programa-title" class="text-lg font-bold text-gray-800">Añadir/Editar Programa</h3>
-        <button id="close-form-programa" class="text-gray-400 hover:text-gray-600 transition-colors">
+        <h3 id="form-servicio-title" class="text-lg font-bold text-gray-800">Añadir/Editar Servicio</h3>
+        <button id="close-form-servicio" class="text-gray-400 hover:text-gray-600 transition-colors">
           <i class="fas fa-times text-xl"></i>
         </button>
       </div>
       <div class="p-6 overflow-y-auto">
-        <form id="form-programa" class="space-y-4">
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Título del Programa *</label>
-            <input type="text" id="prog-titulo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Ej. Programa Senda" required>
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Descripción Corta *</label>
-            <input type="text" id="prog-desc-corta" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Breve resumen para la tarjeta" required>
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Descripción Larga</label>
-            <textarea id="prog-desc-larga" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Todo el detalle de qué trata el programa"></textarea>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
+        <form id="form-servicio" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:col-span-2">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Título del Servicio *</label>
+              <input type="text" id="serv-titulo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Ej. Curso de Excel Intermedio" required>
+            </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Icono (FontAwesome)</label>
-              <input type="text" id="prog-icono" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Ej. fas fa-shield-heart">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Categoría *</label>
+              <select id="serv-categoria" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <option value="curso">Curso</option>
+                <option value="preuniversitario">Preuniversitario</option>
+                <option value="asesoria">Asesoría</option>
+              </select>
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Color Tema</label>
-              <select id="prog-color" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+              <select id="serv-color" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                 <option value="primary">Azul (Primary)</option>
                 <option value="secondary">Verde/Celeste (Secondary)</option>
                 <option value="accent">Naranja (Accent)</option>
               </select>
             </div>
           </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Descripción</label>
+            <textarea id="serv-descripcion" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Descripción del curso o asesoría"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Icono (FontAwesome)</label>
+            <input type="text" id="serv-icono" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Ej. fas fa-laptop">
+          </div>
         </form>
       </div>
       <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0">
-        <button id="cancel-form-programa-btn" class="px-4 py-2 text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors font-medium">Cancelar</button>
-        <button id="save-form-programa-btn" class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium">Guardar Cambios</button>
+        <button id="cancel-form-servicio-btn" class="px-4 py-2 text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors font-medium">Cancelar</button>
+        <button id="save-form-servicio-btn" class="px-4 py-2 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 transition-colors font-medium">Guardar Cambios</button>
       </div>
     </div>
   </div>
 
-  <script src="../js/dashboard-programas.js"></script>
+  <script src="../js/dashboard-servicios.js"></script>
 </body>
 </html>
 

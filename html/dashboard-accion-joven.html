@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acción Joven - Panel de Administración</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7' },
+            secondary: { 50: '#f0fdf4', 100: '#dcfce7', 500: '#22c55e', 600: '#16a34a' },
+            accent: { 50: '#fff7ed', 100: '#ffedd5', 500: '#f97316', 600: '#ea580c' },
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-gray-50 h-screen flex overflow-hidden font-sans">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white border-r border-gray-200 flex flex-col hidden md:flex">
+    <div class="p-6 border-b border-gray-200">
+      <h2 class="text-2xl font-black text-primary-600 tracking-tight">Panel Admin</h2>
+    </div>
+    <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+      <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-chart-pie"></i> Resumen
+      </a>
+      <a href="dashboard-usuarios.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-users"></i> Usuarios
+      </a>
+      <a href="dashboard-calendario.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-calendar-alt"></i> Calendario
+      </a>
+      <a href="dashboard-programas.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-bullhorn"></i> Programas
+      </a>
+      <a href="dashboard-servicios.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-chalkboard-teacher"></i> Servicios
+      </a>
+      <a href="dashboard-accion-joven.html" class="flex items-center gap-3 px-4 py-3 bg-primary-50 text-primary-600 rounded-lg font-semibold">
+        <i class="fas fa-hands-helping"></i> Acción Joven
+      </a>
+      <a href="dashboard-mensajes.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-envelope"></i> Mensajes
+      </a>
+      <a href="dashboard-config.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+        <i class="fas fa-cog"></i> Configuración
+      </a>
+    </nav>
+    <div class="p-4 border-t border-gray-200">
+      <a href="../index.html" class="flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium">
+        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <!-- Topbar -->
+    <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 shrink-0">
+      <div class="flex items-center gap-4">
+        <button class="md:hidden text-gray-500 hover:text-primary-500 text-xl">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="text-xl font-semibold text-gray-800">Acción Joven</h1>
+      </div>
+      <div class="flex items-center gap-4">
+        <button class="text-gray-500 hover:text-primary-500 transition-colors p-2 rounded-full hover:bg-gray-100 relative">
+          <i class="fas fa-bell"></i>
+          <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+        </button>
+        <div class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center font-bold">
+          A
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <div class="p-6 md:p-8 flex-1 overflow-y-auto">
+      <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-1">Gestión de Acción Joven (Eventos)</h2>
+          <p class="text-gray-600">Administra los eventos, voluntariados y actividades disponibles para inscripción.</p>
+        </div>
+        <div class="flex gap-3">
+          <button id="add-evento-btn" class="px-4 py-2 bg-accent-500 text-white rounded-lg hover:bg-accent-600 transition-colors font-medium flex items-center gap-2">
+            <i class="fas fa-plus"></i> Nuevo Evento
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
+          <div class="w-12 h-12 rounded-lg bg-green-50 text-green-500 flex items-center justify-center text-xl">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500 font-medium">Eventos Activos</p>
+            <p class="text-2xl font-bold text-gray-800" id="active-count">0</p>
+          </div>
+        </div>
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
+          <div class="w-12 h-12 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center text-xl">
+            <i class="fas fa-users"></i>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500 font-medium">Total Voluntarios</p>
+            <p class="text-2xl font-bold text-gray-800" id="total-enrolled">0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Eventos Grid -->
+      <div class="mb-4">
+        <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+          <i class="fas fa-hands-helping text-accent-500"></i> Eventos y Voluntariados
+        </h3>
+      </div>
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6" id="eventos-grid">
+        <!-- Rendered by JS -->
+      </div>
+      
+    </div>
+  </main>
+
+  <!-- Modal Formulario Evento -->
+  <div id="form-evento-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
+        <h3 id="form-evento-title" class="text-lg font-bold text-gray-800">Añadir/Editar Evento</h3>
+        <button id="close-form-evento" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto">
+        <form id="form-evento" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:col-span-2">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Título del Evento *</label>
+              <input type="text" id="ev-titulo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500" placeholder="Ej. Limpieza del Parque O'Higgins" required>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha *</label>
+              <input type="date" id="ev-fecha" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500" required>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Hora (Inicio - Fin) *</label>
+              <div class="flex items-center gap-2">
+                <input type="time" id="ev-hora-inicio" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500" required>
+                <span>-</span>
+                <input type="time" id="ev-hora-fin" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500">
+              </div>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Lugar / Ubicación *</label>
+              <input type="text" id="ev-lugar" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500" placeholder="Ej. Entrada principal Parque O'Higgins" required>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Descripción y Requisitos</label>
+              <textarea id="ev-descripcion" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500" placeholder="Detalles de la actividad, qué llevar, etc."></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Cupos Máximos</label>
+              <input type="number" id="ev-cupos" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500" placeholder="Ej. 50 (Dejar vacío si no hay límite)">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Color Tema</label>
+              <select id="ev-color" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500">
+                <option value="primary">Azul (Primary)</option>
+                <option value="secondary">Verde/Celeste (Secondary)</option>
+                <option value="accent" selected>Naranja (Accent)</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0">
+        <button id="cancel-form-evento-btn" class="px-4 py-2 text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors font-medium">Cancelar</button>
+        <button id="save-form-evento-btn" class="px-4 py-2 bg-accent-500 text-white rounded-lg hover:bg-accent-600 transition-colors font-medium">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Detalle Evento -->
+  <div id="evento-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
+        <h3 id="evento-modal-title" class="text-lg font-bold text-gray-800">Detalles del Evento</h3>
+        <button id="close-evento-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto">
+        <div id="evento-modal-body" class="space-y-4">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+      <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end shrink-0">
+        <button id="close-evento-modal-btn" class="px-4 py-2 text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors font-medium">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/dashboard-accion-joven.js"></script>
+</body>
+</html>

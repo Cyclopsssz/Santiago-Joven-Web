@@ -1,29 +1,41 @@
 document.addEventListener('DOMContentLoaded', () => {
   // ==================== DATA (MOCKS SEPARADOS) ====================
-  const programasDB = [
+  const serviciosDB = [
     {
-      id: 1,
-      name: 'Programa Lazos',
-      icon: 'fas fa-hands-holding-child',
-      color: 'secondary',
-      description: 'Prevención de la delincuencia y conductas de riesgo en jóvenes mediante Terapia Multisistémica (MST).',
-      target: 'NNA de 10 a 17 años con factores de riesgo',
-      enrolled: 45,
-      sessions: 128,
+      id: 3,
+      name: 'Preuniversitario Gratuito',
+      categoria: 'preuniversitario',
+      icon: 'fas fa-graduation-cap',
+      color: 'primary',
+      description: 'Preparación PAES en Competencia Lectora, Matemáticas (M1) y Ciencias Sociales.',
+      enrolled: 156,
+      sessions: 240,
       active: true,
-      details: 'Estrategia de intervención y prevención social de la Subsecretaría de Prevención del Delito (SPD).'
+      details: 'Programa de preparación gratuita para la PAES. Incluye tres módulos: Competencia Lectora, Matemática M1 y Ciencias Sociales/Historia.'
     },
     {
-      id: 2,
-      name: 'Programa Senda',
-      icon: 'fas fa-shield-heart',
-      color: 'accent',
-      description: 'Prevención del consumo de alcohol y drogas. Promoción de estilos de vida saludables.',
-      target: 'NNA y jóvenes de la comuna de Santiago',
-      enrolled: 72,
-      sessions: 96,
+      id: 4,
+      name: 'Curso de Inteligencia Artificial',
+      categoria: 'curso',
+      icon: 'fas fa-robot',
+      color: 'primary',
+      description: 'Fundamentos de IA, machine learning y aplicaciones prácticas en la vida cotidiana.',
+      enrolled: 38,
+      sessions: 12,
       active: true,
-      details: 'Programa del Servicio Nacional para la Prevención y Rehabilitación del Consumo de Drogas y Alcohol.'
+      details: 'Curso introductorio de 12 sesiones sobre inteligencia artificial.'
+    },
+    {
+      id: 5,
+      name: 'Curso de Excel',
+      categoria: 'curso',
+      icon: 'fas fa-file-excel',
+      color: 'secondary',
+      description: 'Dominio de Excel desde nivel básico hasta intermedio. Fórmulas, funciones y tablas dinámicas.',
+      enrolled: 64,
+      sessions: 18,
+      active: false,
+      details: 'Capacitación práctica en Microsoft Excel.'
     }
   ];
 
@@ -35,31 +47,32 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // ==================== DOM ====================
-  const progGrid = document.getElementById('programas-grid');
+  const servGrid = document.getElementById('servicios-grid');
   const activeCount = document.getElementById('active-count');
   const totalEnrolled = document.getElementById('total-enrolled');
   const totalSessions = document.getElementById('total-sessions');
   const pausedCount = document.getElementById('paused-count');
 
   // Modal Detalles
-  const detailModal = document.getElementById('program-modal');
+  const detailModal = document.getElementById('program-modal'); // Reutilizamos el id para el detalle
   const modalTitle = document.getElementById('program-modal-title');
   const modalBody = document.getElementById('program-modal-body');
   
-  // Modal Formulario Programas
-  const formProgModal = document.getElementById('form-programa-modal');
-  const addProgBtn = document.getElementById('add-programa-btn');
+  // Modal Formulario Servicios
+  const formServModal = document.getElementById('form-servicio-modal');
+  const addServBtn = document.getElementById('add-servicio-btn');
 
   // ==================== RENDER ====================
   function updateStats() {
-    activeCount.textContent = programasDB.filter(p => p.active).length;
-    pausedCount.textContent = programasDB.filter(p => !p.active).length;
-    totalEnrolled.textContent = programasDB.reduce((sum, p) => sum + (p.enrolled || 0), 0);
-    totalSessions.textContent = programasDB.reduce((sum, p) => sum + (p.sessions || 0), 0);
+    activeCount.textContent = serviciosDB.filter(p => p.active).length;
+    pausedCount.textContent = serviciosDB.filter(p => !p.active).length;
+    totalEnrolled.textContent = serviciosDB.reduce((sum, p) => sum + (p.enrolled || 0), 0);
+    totalSessions.textContent = serviciosDB.reduce((sum, p) => sum + (p.sessions || 0), 0);
   }
 
   function createCardHTML(p) {
     const cfg = colorConfig[p.color] || colorConfig.primary;
+    const subtext = p.categoria.toUpperCase();
     
     return `
       <div class="bg-white rounded-xl border border-gray-100 overflow-hidden dashboard-card relative group" data-id="${p.id}">
@@ -81,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
               <div>
                 <h3 class="font-bold text-gray-800 text-lg line-clamp-1" title="${p.name}">${p.name}</h3>
-                <p class="text-xs text-gray-500 line-clamp-1">${p.target}</p>
+                <p class="text-xs text-gray-500 line-clamp-1">${subtext}</p>
               </div>
             </div>
           </div>
@@ -122,15 +135,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderUI() {
-    progGrid.innerHTML = programasDB.map(p => createCardHTML(p)).join('');
+    servGrid.innerHTML = serviciosDB.map(p => createCardHTML(p)).join('');
     updateStats();
   }
 
   // ==================== MODALS LOGIC ====================
   function openDetail(id) {
-    const p = programasDB.find(pr => pr.id === id);
+    const p = serviciosDB.find(pr => pr.id === id);
     if (!p) return;
     const cfg = colorConfig[p.color] || colorConfig.primary;
+    const subtext = `Categoría: ${p.categoria}`;
 
     modalTitle.textContent = p.name;
     modalBody.innerHTML = `
@@ -147,8 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <p class="text-gray-600 text-sm">${p.details || 'Sin detalles adicionales'}</p>
       </div>
       <div>
-        <h4 class="text-sm font-semibold text-gray-700 mb-1">Población Objetivo</h4>
-        <p class="text-gray-600 text-sm">${p.target}</p>
+        <h4 class="text-sm font-semibold text-gray-700 mb-1">Categoría</h4>
+        <p class="text-gray-600 text-sm">${subtext}</p>
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div class="bg-blue-50 rounded-lg p-3 text-center">
@@ -166,20 +180,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function closeAllModals() {
     detailModal.classList.add('hidden');
-    formProgModal.classList.add('hidden');
+    formServModal.classList.add('hidden');
   }
 
   // Eventos de apertura de modales de creación
-  addProgBtn.addEventListener('click', () => {
-    document.getElementById('form-programa').reset();
-    document.getElementById('form-programa-title').textContent = 'Añadir Programa';
-    formProgModal.classList.remove('hidden');
+  addServBtn.addEventListener('click', () => {
+    document.getElementById('form-servicio').reset();
+    document.getElementById('form-servicio-title').textContent = 'Añadir Servicio';
+    formServModal.classList.remove('hidden');
   });
 
   // Eventos de cierre en modales
   const closeSelectors = [
     '#close-program-modal', '#close-program-modal-btn',
-    '#close-form-programa', '#cancel-form-programa-btn'
+    '#close-form-servicio', '#cancel-form-servicio-btn'
   ];
   closeSelectors.forEach(selector => {
     const el = document.querySelector(selector);
@@ -190,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Cierre por clic fuera del modal
-  [detailModal, formProgModal].forEach(m => {
+  [detailModal, formServModal].forEach(m => {
     m.addEventListener('click', (e) => {
       if (e.target === m) closeAllModals();
     });
@@ -202,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleBtn = e.target.closest('.toggle-btn');
     if (toggleBtn) {
       const id = parseInt(toggleBtn.dataset.id);
-      const p = programasDB.find(pr => pr.id === id);
+      const p = serviciosDB.find(pr => pr.id === id);
       if (p) {
         p.active = !p.active;
         renderUI();
@@ -220,18 +234,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Botón Editar
     const editBtn = e.target.closest('.edit-btn');
     if (editBtn) {
-      document.getElementById('form-programa-title').textContent = 'Editar Programa';
-      formProgModal.classList.remove('hidden');
+      document.getElementById('form-servicio-title').textContent = 'Editar Servicio';
+      formServModal.classList.remove('hidden');
       return;
     }
 
     // Botón Eliminar
     const delBtn = e.target.closest('.delete-btn');
     if (delBtn) {
-      if(confirm('¿Estás seguro que deseas eliminar este programa? (Simulación visual)')) {
+      if(confirm('¿Estás seguro que deseas eliminar este servicio? (Simulación visual)')) {
         const id = parseInt(delBtn.dataset.id);
-        const idx = programasDB.findIndex(x => x.id === id);
-        if(idx !== -1) programasDB.splice(idx, 1);
+        const idx = serviciosDB.findIndex(x => x.id === id);
+        if(idx !== -1) serviciosDB.splice(idx, 1);
         renderUI();
       }
       return;
@@ -239,9 +253,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Eventos de guardado (Prevent default para que no recargue)
-  document.getElementById('save-form-programa-btn').addEventListener('click', (e) => {
+  document.getElementById('save-form-servicio-btn').addEventListener('click', (e) => {
     e.preventDefault();
-    alert('Simulación: Programa guardado exitosamente.');
+    alert('Simulación: Servicio guardado exitosamente.');
     closeAllModals();
   });
 
