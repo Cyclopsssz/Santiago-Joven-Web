@@ -1,75 +1,58 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // ==================== DATA (MOCKS SEPARADOS) ====================
-  const programasDB = [
-    {
-      id: 1,
-      name: 'Programa Lazos',
-      icon: 'fas fa-hands-holding-child',
-      color: 'secondary',
-      description: 'Prevención de la delincuencia y conductas de riesgo en jóvenes mediante Terapia Multisistémica (MST).',
-      target: 'NNA de 10 a 17 años con factores de riesgo',
-      enrolled: 45,
-      sessions: 128,
-      active: true,
-      details: 'Estrategia de intervención y prevención social de la Subsecretaría de Prevención del Delito (SPD).'
-    },
-    {
-      id: 2,
-      name: 'Programa Senda',
-      icon: 'fas fa-shield-heart',
-      color: 'accent',
-      description: 'Prevención del consumo de alcohol y drogas. Promoción de estilos de vida saludables.',
-      target: 'NNA y jóvenes de la comuna de Santiago',
-      enrolled: 72,
-      sessions: 96,
-      active: true,
-      details: 'Programa del Servicio Nacional para la Prevención y Rehabilitación del Consumo de Drogas y Alcohol.'
-    }
-  ];
+import { supabase } from './api.js';
 
-  // ==================== COLOR CONFIG ====================
+document.addEventListener('DOMContentLoaded', async () => {
+  let programasDB = [];
+
   const colorConfig = {
     primary: { bg: 'bg-blue-50', text: 'text-primary-600', icon: 'bg-blue-100 text-primary-600', border: 'border-primary-500' },
     secondary: { bg: 'bg-green-50', text: 'text-secondary-600', icon: 'bg-green-100 text-secondary-600', border: 'border-secondary-500' },
     accent: { bg: 'bg-orange-50', text: 'text-accent-600', icon: 'bg-orange-100 text-accent-600', border: 'border-accent-500' },
   };
 
-  // ==================== DOM ====================
   const progGrid = document.getElementById('programas-grid');
   const activeCount = document.getElementById('active-count');
   const totalEnrolled = document.getElementById('total-enrolled');
   const totalSessions = document.getElementById('total-sessions');
   const pausedCount = document.getElementById('paused-count');
 
-  // Modal Detalles
   const detailModal = document.getElementById('program-modal');
   const modalTitle = document.getElementById('program-modal-title');
   const modalBody = document.getElementById('program-modal-body');
   
-  // Modal Formulario Programas
   const formProgModal = document.getElementById('form-programa-modal');
   const addProgBtn = document.getElementById('add-programa-btn');
+  const formTitle = document.getElementById('form-programa-title');
 
-  // ==================== RENDER ====================
+  let currentEditId = null;
+
+  async function fetchProgramas() {
+    const { data, error } = await supabase.from('programas').select('*').order('created_at', { ascending: false });
+    if (error) {
+      console.error('Error cargando programas:', error);
+      return;
+    }
+    programasDB = data;
+    renderUI();
+  }
+
   function updateStats() {
-    activeCount.textContent = programasDB.filter(p => p.active).length;
-    pausedCount.textContent = programasDB.filter(p => !p.active).length;
-    totalEnrolled.textContent = programasDB.reduce((sum, p) => sum + (p.enrolled || 0), 0);
-    totalSessions.textContent = programasDB.reduce((sum, p) => sum + (p.sessions || 0), 0);
+    activeCount.textContent = programasDB.filter(p => p.activo).length;
+    pausedCount.textContent = programasDB.filter(p => !p.activo).length;
+    if(totalEnrolled) totalEnrolled.textContent = 0; 
+    if(totalSessions) totalSessions.textContent = 0; 
   }
 
   function createCardHTML(p) {
-    const cfg = colorConfig[p.color] || colorConfig.primary;
+    const cfg = colorConfig[p.color_tema] || colorConfig.primary;
     
     return `
       <div class="bg-white rounded-xl border border-gray-100 overflow-hidden dashboard-card relative group" data-id="${p.id}">
-        <!-- Floating Actions Overlay (Edit/Delete) -->
         <div class="absolute top-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <button class="edit-btn w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200 transition-colors shadow-sm" data-id="${p.id}" title="Editar">
-            <i class="fas fa-pen text-xs"></i>
+            <i class="fas fa-pen text-xs pointer-events-none"></i>
           </button>
           <button class="delete-btn w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center hover:bg-red-200 transition-colors shadow-sm" data-id="${p.id}" title="Eliminar">
-            <i class="fas fa-trash text-xs"></i>
+            <i class="fas fa-trash text-xs pointer-events-none"></i>
           </button>
         </div>
 
@@ -77,44 +60,25 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="flex items-start justify-between mb-4 pr-20">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-lg ${cfg.icon} flex items-center justify-center flex-shrink-0">
-                <i class="${p.icon} text-xl"></i>
+                <i class="${p.icono_fa} text-xl"></i>
               </div>
               <div>
-                <h3 class="font-bold text-gray-800 text-lg line-clamp-1" title="${p.name}">${p.name}</h3>
-                <p class="text-xs text-gray-500 line-clamp-1">${p.target}</p>
+                <h3 class="font-bold text-gray-800 text-lg line-clamp-1" title="${p.titulo}">${p.titulo}</h3>
               </div>
             </div>
           </div>
-          <p class="text-gray-600 text-sm mb-5 h-10 line-clamp-2">${p.description}</p>
+          <p class="text-gray-600 text-sm mb-5 h-10 line-clamp-2">${p.descripcion_corta || ''}</p>
           <div class="flex items-center gap-6 text-sm mb-4">
             <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
-                <i class="fas fa-users text-xs"></i>
-              </div>
-              <div>
-                <p class="text-gray-500 text-xs">Inscritos</p>
-                <p class="font-bold text-gray-800">${p.enrolled}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center">
-                <i class="fas fa-chalkboard text-xs"></i>
-              </div>
-              <div>
-                <p class="text-gray-500 text-xs">Sesiones</p>
-                <p class="font-bold text-gray-800">${p.sessions}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <button class="toggle-btn relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${p.active ? 'bg-green-500' : 'bg-gray-300'}" data-id="${p.id}" title="${p.active ? 'Pausar' : 'Activar'}">
-                <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${p.active ? 'translate-x-6' : 'translate-x-1'}"></span>
+              <button class="toggle-btn relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${p.activo ? 'bg-green-500' : 'bg-gray-300'}" data-id="${p.id}" title="${p.activo ? 'Pausar' : 'Activar'}">
+                <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm pointer-events-none ${p.activo ? 'translate-x-6' : 'translate-x-1'}"></span>
               </button>
             </div>
           </div>
         </div>
         <div class="px-6 py-3 bg-gray-50 border-t border-gray-100 flex justify-end">
           <button class="detail-btn text-sm text-primary-500 font-semibold hover:text-primary-600 transition-colors flex items-center gap-1" data-id="${p.id}">
-            Ver detalles <i class="fas fa-arrow-right text-xs"></i>
+            Ver detalles <i class="fas fa-arrow-right text-xs pointer-events-none"></i>
           </button>
         </div>
       </div>
@@ -126,39 +90,26 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStats();
   }
 
-  // ==================== MODALS LOGIC ====================
   function openDetail(id) {
     const p = programasDB.find(pr => pr.id === id);
     if (!p) return;
-    const cfg = colorConfig[p.color] || colorConfig.primary;
+    const cfg = colorConfig[p.color_tema] || colorConfig.primary;
 
-    modalTitle.textContent = p.name;
+    modalTitle.textContent = p.titulo;
     modalBody.innerHTML = `
       <div class="flex items-center gap-3 mb-2">
         <div class="w-10 h-10 rounded-lg ${cfg.icon} flex items-center justify-center">
-          <i class="${p.icon}"></i>
+          <i class="${p.icono_fa}"></i>
         </div>
         <div>
-          <span class="text-xs font-medium px-2 py-0.5 rounded ${p.active ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${p.active ? 'Activo' : 'Pausado'}</span>
+          <span class="text-xs font-medium px-2 py-0.5 rounded ${p.activo ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${p.activo ? 'Activo' : 'Pausado'}</span>
         </div>
       </div>
       <div>
+        <h4 class="text-sm font-semibold text-gray-700 mb-1">Descripción Corta</h4>
+        <p class="text-gray-600 text-sm mb-2">${p.descripcion_corta || 'Sin resumen'}</p>
         <h4 class="text-sm font-semibold text-gray-700 mb-1">Descripción Larga</h4>
-        <p class="text-gray-600 text-sm">${p.details || 'Sin detalles adicionales'}</p>
-      </div>
-      <div>
-        <h4 class="text-sm font-semibold text-gray-700 mb-1">Población Objetivo</h4>
-        <p class="text-gray-600 text-sm">${p.target}</p>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div class="bg-blue-50 rounded-lg p-3 text-center">
-          <p class="text-2xl font-bold text-primary-600">${p.enrolled}</p>
-          <p class="text-xs text-gray-500">Inscritos</p>
-        </div>
-        <div class="bg-purple-50 rounded-lg p-3 text-center">
-          <p class="text-2xl font-bold text-purple-600">${p.sessions}</p>
-          <p class="text-xs text-gray-500">Sesiones</p>
-        </div>
+        <p class="text-gray-600 text-sm">${p.descripcion_larga || 'Sin detalles adicionales'}</p>
       </div>
     `;
     detailModal.classList.remove('hidden');
@@ -167,16 +118,16 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeAllModals() {
     detailModal.classList.add('hidden');
     formProgModal.classList.add('hidden');
+    currentEditId = null;
   }
 
-  // Eventos de apertura de modales de creación
   addProgBtn.addEventListener('click', () => {
     document.getElementById('form-programa').reset();
-    document.getElementById('form-programa-title').textContent = 'Añadir Programa';
+    if(formTitle) formTitle.textContent = 'Añadir Programa';
+    currentEditId = null;
     formProgModal.classList.remove('hidden');
   });
 
-  // Eventos de cierre en modales
   const closeSelectors = [
     '#close-program-modal', '#close-program-modal-btn',
     '#close-form-programa', '#cancel-form-programa-btn'
@@ -189,62 +140,102 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Cierre por clic fuera del modal
   [detailModal, formProgModal].forEach(m => {
-    m.addEventListener('click', (e) => {
-      if (e.target === m) closeAllModals();
-    });
+    if(m) {
+        m.addEventListener('click', (e) => {
+          if (e.target === m) closeAllModals();
+        });
+    }
   });
 
-  // ==================== DELEGATED EVENTS ====================
-  document.addEventListener('click', (e) => {
-    // Toggle Activo/Inactivo
+  document.addEventListener('click', async (e) => {
     const toggleBtn = e.target.closest('.toggle-btn');
     if (toggleBtn) {
-      const id = parseInt(toggleBtn.dataset.id);
+      const id = toggleBtn.dataset.id;
       const p = programasDB.find(pr => pr.id === id);
       if (p) {
-        p.active = !p.active;
-        renderUI();
+        const newStatus = !p.activo;
+        const { error } = await supabase.from('programas').update({ activo: newStatus }).eq('id', id);
+        if (!error) fetchProgramas();
       }
       return;
     }
 
-    // Ver Detalles
     const detailBtn = e.target.closest('.detail-btn');
     if (detailBtn) {
-      openDetail(parseInt(detailBtn.dataset.id));
+      openDetail(detailBtn.dataset.id);
       return;
     }
 
-    // Botón Editar
     const editBtn = e.target.closest('.edit-btn');
     if (editBtn) {
-      document.getElementById('form-programa-title').textContent = 'Editar Programa';
-      formProgModal.classList.remove('hidden');
+      const id = editBtn.dataset.id;
+      const p = programasDB.find(pr => pr.id === id);
+      if (p) {
+        document.getElementById('prog-titulo').value = p.titulo || '';
+        document.getElementById('prog-desc-corta').value = p.descripcion_corta || '';
+        document.getElementById('prog-desc-larga').value = p.descripcion_larga || '';
+        document.getElementById('prog-icono').value = p.icono_fa || '';
+        document.getElementById('prog-color').value = p.color_tema || 'primary';
+        
+        if(formTitle) formTitle.textContent = 'Editar Programa';
+        currentEditId = id;
+        formProgModal.classList.remove('hidden');
+      }
       return;
     }
 
-    // Botón Eliminar
     const delBtn = e.target.closest('.delete-btn');
     if (delBtn) {
-      if(confirm('¿Estás seguro que deseas eliminar este programa? (Simulación visual)')) {
-        const id = parseInt(delBtn.dataset.id);
-        const idx = programasDB.findIndex(x => x.id === id);
-        if(idx !== -1) programasDB.splice(idx, 1);
-        renderUI();
+      if(confirm('¿Estás seguro que deseas eliminar este programa?')) {
+        const id = delBtn.dataset.id;
+        const { error } = await supabase.from('programas').delete().eq('id', id);
+        if (!error) fetchProgramas();
+        else alert('Error al eliminar');
       }
       return;
     }
   });
 
-  // Eventos de guardado (Prevent default para que no recargue)
-  document.getElementById('save-form-programa-btn').addEventListener('click', (e) => {
+  document.getElementById('save-form-programa-btn').addEventListener('click', async (e) => {
     e.preventDefault();
-    alert('Simulación: Programa guardado exitosamente.');
-    closeAllModals();
+    const titulo = document.getElementById('prog-titulo').value;
+    const descripcion_corta = document.getElementById('prog-desc-corta').value;
+    const descripcion_larga = document.getElementById('prog-desc-larga').value;
+    const icono_fa = document.getElementById('prog-icono').value || 'fas fa-star';
+    const color_tema = document.getElementById('prog-color').value;
+
+    if (!titulo || !descripcion_corta) {
+      alert('El título y descripción corta son requeridos');
+      return;
+    }
+
+    const payload = {
+      titulo,
+      descripcion_corta,
+      descripcion_larga,
+      icono_fa,
+      color_tema,
+    };
+
+    if (currentEditId) {
+      const { error } = await supabase.from('programas').update(payload).eq('id', currentEditId);
+      if (error) alert('Error al actualizar programa');
+      else {
+        closeAllModals();
+        fetchProgramas();
+      }
+    } else {
+      payload.activo = true;
+      const { error } = await supabase.from('programas').insert([payload]);
+      if (error) { alert('Error al crear programa: ' + error.message); console.error(error); }
+      else {
+        closeAllModals();
+        fetchProgramas();
+      }
+    }
   });
 
-  // ==================== INIT ====================
-  renderUI();
+  fetchProgramas();
 });
+
