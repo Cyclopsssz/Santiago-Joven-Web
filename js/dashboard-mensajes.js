@@ -1,39 +1,7 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // ==================== DATA MOCKUP ====================
-  let messages = [
-    {
-      id: 1,
-      nombre: 'María González',
-      email: 'maria.gonzalez@ejemplo.cl',
-      fecha: '2026-06-03T10:30:00',
-      leido: false,
-      mensaje: 'Hola, me gustaría saber cuándo abren las inscripciones para el próximo taller de liderazgo. Fui al anterior y me encantó la dinámica. ¡Saludos!'
-    },
-    {
-      id: 2,
-      nombre: 'Pedro Soto',
-      email: 'psoto22@mail.com',
-      fecha: '2026-06-02T15:45:00',
-      leido: true,
-      mensaje: 'Estimados, tengo un problema con mi cuenta. No puedo actualizar mi número de teléfono en el perfil. ¿Podrían ayudarme con eso por favor? Gracias de antemano.'
-    },
-    {
-      id: 3,
-      nombre: 'Ana Rojas',
-      email: 'ana.rojas.estudiante@liceo.cl',
-      fecha: '2026-06-01T09:15:00',
-      leido: false,
-      mensaje: 'Hola buenas tardes. Quería sugerir si pueden hacer más actividades deportivas los fines de semana, ya que muchos estudiamos de lunes a viernes y no podemos asistir a los talleres de la tarde.'
-    },
-    {
-      id: 4,
-      nombre: 'Carlos Miranda',
-      email: 'carlos_m@gmail.com',
-      fecha: '2026-05-30T11:20:00',
-      leido: true,
-      mensaje: 'Quiero felicitar al equipo por la feria vocacional de la semana pasada, estuvo excelente y me ayudó mucho a decidir mi futuro. ¡Sigan así!'
-    }
-  ];
+﻿import { supabase } from './api.js';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  let messages = [];
 
   // ==================== DOM REFERENCES ====================
   const tableBody = document.getElementById('messages-table-body');
@@ -56,13 +24,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentMessageId = null;
 
+  // ==================== FETCH DATA ====================
+  async function fetchMessages() {
+    tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8"><i class="fas fa-spinner fa-spin text-primary-500 text-3xl"></i></td></tr>`;
+    
+    const { data, error } = await supabase
+      .from('contacto')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching messages:', error);
+      tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-red-500">Error al cargar los mensajes.</td></tr>`;
+      return;
+    }
+
+    messages = data.map(msg => ({
+      ...msg,
+      leido: !!msg.leido,
+      fecha: msg.created_at
+    }));
+
+    renderTable();
+  }
+
   // ==================== RENDER TABLE ====================
   function renderTable() {
     const searchTerm = searchInput.value.toLowerCase().trim();
     const filterStatus = statusFilter.value;
 
     const filtered = messages.filter(msg => {
-      const matchSearch = msg.nombre.toLowerCase().includes(searchTerm) || msg.email.toLowerCase().includes(searchTerm);
+      const nombre = msg.nombre || '';
+      const email = msg.email || '';
+      const matchSearch = nombre.toLowerCase().includes(searchTerm) || email.toLowerCase().includes(searchTerm);
       let matchStatus = true;
       if (filterStatus === 'unread') matchStatus = !msg.leido;
       if (filterStatus === 'read') matchStatus = msg.leido;
@@ -85,9 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Ordenar del más nuevo al más antiguo
-    filtered.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-
     tableBody.innerHTML = filtered.map(msg => {
       const dateObj = new Date(msg.fecha);
       const dateFormatted = dateObj.toLocaleDateString('es-CL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
@@ -98,15 +89,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const rowClass = msg.leido ? 'bg-white' : 'bg-primary-50/30';
       const fontClass = msg.leido ? 'font-normal' : 'font-semibold text-gray-900';
       
-      // Extracto del mensaje
-      const extracto = msg.mensaje.length > 50 ? msg.mensaje.substring(0, 50) + '...' : msg.mensaje;
+      const extracto = msg.mensaje && msg.mensaje.length > 50 ? msg.mensaje.substring(0, 50) + '...' : (msg.mensaje || '');
 
       return `
         <tr class="${rowClass} border-b hover:bg-gray-50 transition-colors cursor-pointer message-row" data-id="${msg.id}">
           <td class="px-6 py-4">
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
-                ${msg.nombre.charAt(0).toUpperCase()}
+                ${msg.nombre ? msg.nombre.charAt(0).toUpperCase() : '?'}
               </div>
               <div>
                 <p class="${fontClass}">${msg.nombre}</p>
@@ -136,14 +126,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==================== MODAL LOGIC ====================
-  function openMessage(id) {
+  async function openMessage(id) {
     const msg = messages.find(m => m.id === id);
     if (!msg) return;
 
     currentMessageId = id;
 
-    // Poblar modal
-    modalAvatar.textContent = msg.nombre.charAt(0).toUpperCase();
+    modalAvatar.textContent = msg.nombre ? msg.nombre.charAt(0).toUpperCase() : '?';
     modalName.textContent = msg.nombre;
     modalEmail.textContent = msg.email;
     
@@ -152,18 +141,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     modalBody.textContent = msg.mensaje;
 
-    // Configurar estado visual
     updateModalStatusBadge(msg.leido);
     
-    // Configurar link de respuesta para abrir Gmail
     replyBtn.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${msg.email}&su=Respuesta%20desde%20Apoyo%20Joven`;
     replyBtn.target = '_blank';
 
-    // Marcar como leído automáticamente si era nuevo
     if (!msg.leido) {
       msg.leido = true;
-      renderTable(); // actualizar tabla de fondo
       updateModalStatusBadge(true);
+      renderTable();
+      await supabase.from('contacto').update({ leido: true }).eq('id', id);
     }
 
     modal.classList.remove('hidden');
@@ -188,44 +175,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ==================== EVENT LISTENERS ====================
   
-  // Tabla clicks (delegation)
   tableBody.addEventListener('click', (e) => {
     const row = e.target.closest('.message-row');
     if (row) {
-      const id = parseInt(row.dataset.id);
+      const id = row.dataset.id;
       openMessage(id);
     }
   });
 
-  // Modal actions
   closeModalBtn.addEventListener('click', closeModalHandler);
   modal.addEventListener('click', (e) => {
     if (e.target === modal) closeModalHandler();
   });
 
-  toggleReadBtn.addEventListener('click', () => {
+  toggleReadBtn.addEventListener('click', async () => {
     if (currentMessageId) {
       const msg = messages.find(m => m.id === currentMessageId);
       if (msg) {
         msg.leido = !msg.leido;
         updateModalStatusBadge(msg.leido);
         renderTable();
+        
+        const originalText = toggleReadBtn.textContent;
+        toggleReadBtn.textContent = 'Actualizando...';
+        await supabase.from('contacto').update({ leido: msg.leido }).eq('id', msg.id);
+        toggleReadBtn.textContent = originalText;
       }
     }
   });
 
-  deleteBtn.addEventListener('click', () => {
+  deleteBtn.addEventListener('click', async () => {
     if (currentMessageId && confirm('¿Estás seguro de que deseas eliminar este mensaje?')) {
-      messages = messages.filter(m => m.id !== currentMessageId);
+      const idToDelete = currentMessageId;
+      messages = messages.filter(m => m.id !== idToDelete);
       closeModalHandler();
       renderTable();
+      
+      await supabase.from('contacto').delete().eq('id', idToDelete);
     }
   });
 
-  // Filters
   searchInput.addEventListener('input', renderTable);
   statusFilter.addEventListener('change', renderTable);
 
   // ==================== INIT ====================
-  renderTable();
+  await fetchMessages();
 });

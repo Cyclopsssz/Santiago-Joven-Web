@@ -61,13 +61,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function renderServicios(servicios, filterCategory) {
         if (!serviciosGrid) return;
-        
+
         // Efecto fade out
         serviciosGrid.style.opacity = 0;
-        
+
         setTimeout(() => {
             serviciosGrid.innerHTML = '';
-            
+
             let filtered = servicios;
             if (filterCategory === 'destacado') {
                 filtered = servicios.filter(s => s.destacado === true);
@@ -86,13 +86,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <i class="${icon} text-4xl text-${color}-500 mb-4 bg-${color}-50 p-4 rounded-xl inline-block w-max"></i>
                             <h4 class="text-xl font-bold text-gray-800 mb-2">${s.titulo}</h4>
                             <p class="text-gray-600 mb-6 flex-grow">${s.descripcion}</p>
-                            <button class="btn btn-outline border-${color}-500 text-${color}-500 hover:bg-${color}-500 hover:text-white w-full requires-auth enroll-btn" data-title="${s.titulo}">Inscríbete</button>
+                            <button class="btn btn-outline border-${color}-500 text-${color}-500 hover:bg-${color}-500 hover:text-white w-full requires-auth enroll-btn" data-title="${s.titulo}" data-id="${s.id || 'programa'}" data-type="programa">Inscríbete</button>
                         </div>
                     `;
                     serviciosGrid.innerHTML += html;
                 });
             }
-            
+
             // Re-bind auth logic for new buttons
             document.querySelectorAll('.enroll-btn').forEach(el => {
                 el.addEventListener('click', requireAuth());
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- LÓGICA DE PROGRAMAS (CARRUSEL & MODALES) ---
     function renderProgramas(programas) {
         if (!programasCarousel || !modalesContainer) return;
-        
+
         programasCarousel.innerHTML = '';
         modalesContainer.innerHTML = '';
 
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         programas.forEach(p => {
             const color = p.color_tema || 'secondary';
             const icon = p.icono_fa || 'fas fa-handshake-angle';
-            
+
             // Inyectar Tarjeta en el Carrusel (snap-start y width exacto para que no se corten)
             const cardHtml = `
                 <div class="card w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] snap-start shrink-0 flex flex-col items-center text-center border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 group rounded-2xl bg-white">
@@ -164,14 +164,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Funciones del Carrusel
     function setupCarousel() {
         if (!programasCarousel) return;
-        
+
         if (prevProgramaBtn) {
             prevProgramaBtn.addEventListener('click', () => {
                 const scrollAmount = programasCarousel.clientWidth / 2;
                 programasCarousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
             });
         }
-        
+
         if (nextProgramaBtn) {
             nextProgramaBtn.addEventListener('click', () => {
                 const scrollAmount = programasCarousel.clientWidth / 2;

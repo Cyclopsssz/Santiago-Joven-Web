@@ -9,12 +9,12 @@ const programasStart = html.indexOf('<!-- ==================== SECCIÓN: PROGRAM
 // Si no encuentra el comentario, busca el tag
 let accionText = '';
 if (accionStart !== -1) {
-    accionText = html.substring(accionStart, programasStart);
+  accionText = html.substring(accionStart, programasStart);
 } else {
-    // Buscar la sección manualmente
-    const acc = html.indexOf('<section id="accion"');
-    const prog = html.indexOf('<section id="programas"');
-    accionText = html.substring(acc, prog);
+  // Buscar la sección manualmente
+  const acc = html.indexOf('<section id="accion"');
+  const prog = html.indexOf('<section id="programas"');
+  accionText = html.substring(acc, prog);
 }
 
 // 2. Crear las nuevas secciones dinámicas
@@ -92,9 +92,9 @@ const inicioModales = newHtml.indexOf('<!-- Modales de Programas -->');
 const finModales = newHtml.indexOf('<!-- Scripts -->');
 
 if (inicioModales !== -1 && finModales !== -1) {
-    const modalesContainer = `  <!-- Contenedor Dinámico para Modales -->
+  const modalesContainer = `  <!-- Contenedor Dinámico para Modales -->
   <div id="modales-container"></div>\n\n`;
-    newHtml = newHtml.substring(0, Math.max(0, inicioModales)) + modalesContainer + newHtml.substring(finModales);
+  newHtml = newHtml.substring(0, Math.max(0, inicioModales)) + modalesContainer + newHtml.substring(finModales);
 }
 
 // 4. Cambiar type="module" en programas.js

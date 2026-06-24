@@ -3,6 +3,7 @@ import { showStatusMessage } from './utils.js';
 
 export let currentUser = null;
 export let currentUserEmail = null;
+export let currentUserId = null;
 export let userRole = null;
 
 // Helper global para forzar auth
@@ -89,6 +90,7 @@ export const initAuth = () => {
             await supabase.auth.signOut();
             currentUser = null;
             currentUserEmail = null;
+            currentUserId = null;
             userRole = null;
             if (openLoginBtn) {
                 openLoginBtn.textContent = 'Acceder';
@@ -161,7 +163,8 @@ export const initAuth = () => {
                     // Set global state
                     currentUser = nombreUsuario;
                     currentUserEmail = email;
-                    
+                    currentUserId = data.user.id;
+
                     // Asignar rol desde la base de datos (user_metadata)
                     userRole = data.user.user_metadata?.role === 'admin' ? 'admin' : 'comun';
 
@@ -247,7 +250,7 @@ export const initAuth = () => {
                 if (!error) {
                     // Opcionalmente podemos insertar en una tabla pública 'perfiles' si fuese necesario.
                     // await supabase.from('perfiles').insert({ id: data.user.id, rut: datos.Rut, ... });
-                    
+
                     showStatusMessage(statusDiv, 'registro exitoso', true);
                     registerForm.reset();
 

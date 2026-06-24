@@ -1,6 +1,6 @@
 import { supabase } from './api.js';
 import { showStatusMessage } from './utils.js';
-import { currentUser, currentUserEmail, requireAuth } from './auth.js';
+import { currentUser, currentUserEmail, currentUserId, requireAuth } from './auth.js';
 
 export const initForms = () => {
     // controlador de formulario de encuestas
@@ -124,9 +124,13 @@ export const initForms = () => {
     const closeEnrollBtn = document.getElementById('close-enroll-btn');
     const enrollStatus = document.getElementById('enroll-status');
     let currentEnrollTitle = '';
+    let currentEnrollId = '';
+    let currentEnrollType = 'actividad';
 
-    const openEnrollModal = (title) => {
+    const openEnrollModal = (title, id, type = 'actividad') => {
         currentEnrollTitle = title;
+        currentEnrollId = id;
+        currentEnrollType = type;
         if (enrollCourseName) enrollCourseName.textContent = title;
         
         // Hide other modals just in case
@@ -160,12 +164,18 @@ export const initForms = () => {
 
     if (closeEnrollBtn) closeEnrollBtn.addEventListener('click', closeEnrollModal);
 
-    // Abrir modal al presionar cualquier botón de inscripción
-    document.querySelectorAll('.enroll-btn').forEach(btn => {
-        btn.addEventListener('click', requireAuth((e) => {
-            const title = e.currentTarget.dataset.title;
-            if (title) openEnrollModal(title);
-        }));
+    // Abrir modal al presionar cualquier botón de inscripción (con delegación)
+    document.body.addEventListener('click', (e) => {
+        const btn = e.target.closest('.enroll-btn');
+        if (btn) {
+            const authHandler = requireAuth((evt) => {
+                const title = btn.dataset.title;
+                const id = btn.dataset.id;
+                const type = btn.dataset.type || 'actividad';
+                if (title) openEnrollModal(title, id, type);
+            });
+            authHandler(e);
+        }
     });
 
     if (confirmEnrollBtn) {
@@ -173,15 +183,40 @@ export const initForms = () => {
             if (!currentEnrollTitle) return;
 
             showStatusMessage(enrollStatus, 'Procesando inscripción...', true);
-            
-            const payload = {
-                nombre: currentUser || 'Usuario Logueado',
-                email: currentUserEmail || 'correo@ejemplo.com',
-                actividad: currentEnrollTitle
-            };
-
             try {
-                const { error } = await supabase.from('inscripciones').insert([payload]);
+                let error = null;
+
+                if (currentEnrollType === 'actividad') {
+                    // 1. Inscripción a eventos del calendario (actividades)
+                    const payload = {
+                        user_id: currentUserId,
+                        actividad_id: currentEnrollId,
+                        estado: 'Inscrito',
+                        created_at: new Date().toISOString()
+                    };
+                    const res = await supabase.from('inscripciones_calendario').insert([payload]);
+                    error = res.error;
+                } else if (currentEnrollId === 'voluntariado') {
+                    // 2. Inscripción a Voluntariado
+                    const payload = {
+                        user_id: currentUserId,
+                        tipo_voluntariado: currentEnrollTitle, // Guarda el título del programa (texto)
+                        estado: 'Inscrito',
+                        created_at: new Date().toISOString()
+                    };
+                    const res = await supabase.from('inscripciones_voluntariado').insert([payload]);
+                    error = res.error;
+                } else {
+                    // 3. Inscripción a programas o servicios (Excel, etc)
+                    const payload = {
+                        user_id: currentUserId,
+                        servicio_id: currentEnrollId, // UUID del servicio
+                        estado: 'Inscrito',
+                        created_at: new Date().toISOString()
+                    };
+                    const res = await supabase.from('inscripciones_servicios').insert([payload]);
+                    error = res.error;
+                }
 
                 if (!error) {
                     showStatusMessage(enrollStatus, '¡Inscripción confirmada! Te hemos enviado un correo.', true);

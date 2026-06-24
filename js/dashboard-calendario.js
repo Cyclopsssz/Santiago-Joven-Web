@@ -1,14 +1,8 @@
-document.addEventListener('DOMContentLoaded', () => {
+import { supabase } from './api.js';
+
+document.addEventListener('DOMContentLoaded', async () => {
   // ==================== DATA ====================
-  const events = [
-    { id: 1, title: 'Feria Vocacional 2025', type: 'feria', date: '2025-11-10', active: true, hasCupos: false, cupos: null },
-    { id: 2, title: 'Taller de Liderazgo Juvenil', type: 'taller', date: '2025-11-14', active: true, hasCupos: true, cupos: 30 },
-    { id: 3, title: 'Inicio Curso de IA', type: 'curso', date: '2025-11-20', active: true, hasCupos: true, cupos: 20 },
-    { id: 4, title: 'Campaña Solidaria Navideña', type: 'campana', date: '2025-11-28', active: true, hasCupos: false, cupos: null },
-    { id: 5, title: 'Taller de Oratoria', type: 'taller', date: '2025-12-02', active: true, hasCupos: true, cupos: 25 },
-    { id: 6, title: 'Feria de Emprendimiento', type: 'feria', date: '2025-12-05', active: true, hasCupos: false, cupos: null },
-  ];
-  let nextId = 7;
+  let events = [];
 
   // ==================== DOM REFERENCES ====================
   const tableBody = document.getElementById('events-table-body');
@@ -47,6 +41,34 @@ document.addEventListener('DOMContentLoaded', () => {
     curso: { label: 'Curso', bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-200' },
     campana: { label: 'Campaña', bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-200' },
   };
+
+  // ==================== FETCH DATA ====================
+  async function fetchEvents() {
+    tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8"><i class="fas fa-spinner fa-spin text-primary-500 text-3xl"></i></td></tr>`;
+    
+    const { data, error } = await supabase
+      .from('actividades')
+      .select('*')
+      .order('fecha', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching events:', error);
+      tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-red-500">Error al cargar los eventos.</td></tr>`;
+      return;
+    }
+
+    // Normalizar datos para la UI
+    events = data.map(ev => ({
+      id: ev.id,
+      title: ev.titulo || 'Sin título',
+      type: ev.tipo || 'feria',
+      date: ev.fecha ? ev.fecha.split('T')[0] : '', // YYYY-MM-DD
+      hasCupos: !!ev.tiene_cupo,
+      cupos: ev.cupos
+    }));
+
+    renderTable();
+  }
 
   // ==================== RENDER TABLE ====================
   function renderTable() {
@@ -137,6 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
     formStatus.classList.add('hidden');
     modalTitle.textContent = 'Añadir Evento';
     saveEventBtn.textContent = 'Guardar Evento';
+    saveEventBtn.disabled = false;
   }
 
   function showFormStatus(msg, success) {
@@ -156,6 +179,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeDeleteModal() {
     deleteModal.classList.add('hidden');
     pendingDeleteId = null;
+    confirmDeleteBtn.disabled = false;
+    confirmDeleteBtn.textContent = 'Eliminar Evento';
   }
 
   // ==================== EVENT HANDLERS ====================
@@ -193,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Save (Add or Edit)
-  saveEventBtn.addEventListener('click', () => {
+  saveEventBtn.addEventListener('click', async () => {
     const title = eventTitleInput.value.trim();
     const type = eventTypeInput.value;
     const date = eventDateInput.value;
@@ -205,38 +230,64 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const editId = parseInt(eventEditId.value);
+    const editId = eventEditId.value; // puede ser UUID
+    saveEventBtn.disabled = true;
+    saveEventBtn.textContent = 'Guardando...';
+
+    const payload = {
+      titulo: title,
+      tipo: type,
+      fecha: date,
+      tiene_cupo: hasCupos,
+      cupos: cupos,
+      created_at: new Date().toISOString()
+    };
 
     if (editId) {
       // Edit existing
-      const ev = events.find(e => e.id === editId);
-      if (ev) {
-        ev.title = title;
-        ev.type = type;
-        ev.date = date;
-        ev.hasCupos = hasCupos;
-        ev.cupos = cupos;
+      const { error } = await supabase.from('actividades').update(payload).eq('id', editId);
+      if (error) {
+        showFormStatus('Error al actualizar: ' + error.message, false);
+        saveEventBtn.disabled = false;
+        saveEventBtn.textContent = 'Actualizar Evento';
+        return;
       }
       showFormStatus('Evento actualizado exitosamente', true);
     } else {
       // Add new
-      events.push({ id: nextId++, title, type, date, hasCupos, cupos, active: true });
+      const { error } = await supabase.from('actividades').insert([payload]);
+      if (error) {
+        showFormStatus('Error al crear: ' + error.message, false);
+        saveEventBtn.disabled = false;
+        saveEventBtn.textContent = 'Guardar Evento';
+        return;
+      }
       showFormStatus('Evento añadido exitosamente', true);
     }
 
+    await fetchEvents();
     setTimeout(() => {
       closeModal();
-      renderTable();
     }, 1000);
   });
 
   // Confirm delete
-  confirmDeleteBtn.addEventListener('click', () => {
+  confirmDeleteBtn.addEventListener('click', async () => {
     if (pendingDeleteId !== null) {
-      const idx = events.findIndex(e => e.id === pendingDeleteId);
-      if (idx !== -1) events.splice(idx, 1);
+      confirmDeleteBtn.disabled = true;
+      confirmDeleteBtn.textContent = 'Eliminando...';
+      
+      const { error } = await supabase.from('actividades').delete().eq('id', pendingDeleteId);
+      if (error) {
+        console.error('Error al eliminar:', error);
+        alert('Error al eliminar el evento');
+        confirmDeleteBtn.disabled = false;
+        confirmDeleteBtn.textContent = 'Eliminar Evento';
+        return;
+      }
+
+      await fetchEvents();
       closeDeleteModal();
-      renderTable();
     }
   });
 
@@ -246,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const deleteBtn = e.target.closest('.delete-btn');
 
     if (editBtn) {
-      const id = parseInt(editBtn.dataset.id);
+      const id = editBtn.dataset.id;
       const ev = events.find(e => e.id === id);
       if (!ev) return;
 
@@ -272,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (deleteBtn) {
-      const id = parseInt(deleteBtn.dataset.id);
+      const id = deleteBtn.dataset.id;
       openDeleteModal(id);
     }
   });
@@ -282,5 +333,5 @@ document.addEventListener('DOMContentLoaded', () => {
   typeFilter.addEventListener('change', renderTable);
 
   // ==================== INIT ====================
-  renderTable();
+  await fetchEvents();
 });
