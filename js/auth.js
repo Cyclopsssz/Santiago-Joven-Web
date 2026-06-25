@@ -249,7 +249,13 @@ export const initAuth = () => {
 
                 if (!error) {
                     // Opcionalmente podemos insertar en una tabla pública 'perfiles' si fuese necesario.
-                    // await supabase.from('perfiles').insert({ id: data.user.id, rut: datos.Rut, ... });
+                    // El trigger o el RLS puede manejar el insert inicial. Si el trigger lo insertó, hacemos un update.
+                    // Si no hay trigger, haremos un upsert. Por seguridad, hacemos un update si ya existe.
+                    await supabase.from('perfiles').update({
+                        correo: datos.Email,
+                        rol: 'Usuario',
+                        estado: 'Activo'
+                    }).eq('id', data.user.id);
 
                     showStatusMessage(statusDiv, 'registro exitoso', true);
                     registerForm.reset();

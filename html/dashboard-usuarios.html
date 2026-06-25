@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es" class="scroll-smooth">
 
 <head>
@@ -91,10 +91,7 @@
           <h1 class="text-xl font-semibold text-gray-800">Directorio de Usuarios</h1>
         </div>
         <div class="flex items-center gap-4">
-          <button class="text-gray-500 hover:text-primary-500 transition-colors p-2 rounded-full hover:bg-gray-100 relative">
-            <i class="fas fa-bell"></i>
-          </button>
-          <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
+          <div class="flex items-center gap-3">
             <div class="text-right hidden sm:block">
               <p class="text-sm font-semibold text-gray-800">Admin</p>
               <p class="text-xs text-gray-500">Oficina de Juventud</p>
@@ -114,9 +111,6 @@
           <h2 class="text-2xl font-bold text-gray-800 mb-1">Gestión de Usuarios</h2>
           <p class="text-gray-600">Administra registros, roles y moderación de la plataforma.</p>
         </div>
-        <button class="bg-secondary-500 hover:bg-secondary-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
-          <i class="fas fa-file-excel"></i> Exportar a Excel
-        </button>
       </div>
 
       <!-- Filters & Search Bar -->
@@ -131,7 +125,7 @@
           <select id="role-filter" class="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block p-2.5 outline-none flex-1 md:flex-none">
             <option value="all">Todos los roles</option>
             <option value="admin">Administradores</option>
-            <option value="user">Usuarios</option>
+            <option value="usuario">Usuarios</option>
           </select>
           <select id="age-filter" class="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block p-2.5 outline-none flex-1 md:flex-none">
             <option value="all">Cualquier edad</option>
@@ -156,90 +150,8 @@
                 <th scope="col" class="px-6 py-4 text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody>
-              <!-- User 1 -->
-              <tr class="bg-white border-b hover:bg-gray-50 transition-colors user-row" data-role="user" data-age="18-24">
-                <td class="px-6 py-4">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">M</div>
-                    <div>
-                      <p class="font-semibold text-gray-900">Martín Soto</p>
-                      <p class="text-xs text-gray-500">martin.soto@email.com</p>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">19</td>
-                <td class="px-6 py-4">
-                  <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded border border-blue-200">Usuario</span>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="flex items-center">
-                    <div class="h-2.5 w-2.5 rounded-full bg-green-500 mr-2"></div> Activo
-                  </div>
-                </td>
-                <td class="px-6 py-4">24/05/2026</td>
-                <td class="px-6 py-4 text-right space-x-2">
-                  <button class="text-gray-400 hover:text-gray-700 transition-colors" title="Configurar Usuario" onclick="document.getElementById('edit-user-modal').classList.remove('hidden')"><i class="fas fa-cog"></i></button>
-                  <button class="text-gray-400 hover:text-primary-500 transition-colors" title="Editar Rol"><i class="fas fa-user-edit"></i></button>
-                  <button class="text-gray-400 hover:text-red-500 transition-colors" title="Suspender"><i class="fas fa-ban"></i></button>
-                </td>
-              </tr>
-              
-              <!-- User 2 -->
-              <tr class="bg-white border-b hover:bg-gray-50 transition-colors user-row" data-role="admin" data-age="18-24">
-                <td class="px-6 py-4">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold">V</div>
-                    <div>
-                      <p class="font-semibold text-gray-900">Valentina Ruiz</p>
-                      <p class="text-xs text-gray-500">valen.ruiz@email.com</p>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">22</td>
-                <td class="px-6 py-4">
-                  <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded border border-purple-200">Admin</span>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="flex items-center">
-                    <div class="h-2.5 w-2.5 rounded-full bg-green-500 mr-2"></div> Activo
-                  </div>
-                </td>
-                <td class="px-6 py-4">10/01/2026</td>
-                <td class="px-6 py-4 text-right space-x-2">
-                  <button class="text-gray-400 hover:text-gray-700 transition-colors" title="Configurar Usuario" onclick="document.getElementById('edit-user-modal').classList.remove('hidden')"><i class="fas fa-cog"></i></button>
-                  <button class="text-gray-400 hover:text-primary-500 transition-colors" title="Editar Rol"><i class="fas fa-user-edit"></i></button>
-                  <button class="text-gray-400 hover:text-red-500 transition-colors" title="Suspender"><i class="fas fa-ban"></i></button>
-                </td>
-              </tr>
-
-              <!-- User 3 -->
-              <tr class="bg-white border-b hover:bg-gray-50 transition-colors user-row" data-role="user" data-age="14-17">
-                <td class="px-6 py-4">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold">D</div>
-                    <div>
-                      <p class="font-semibold text-gray-900">Diego Castro</p>
-                      <p class="text-xs text-gray-500">diego.troll@email.com</p>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">16</td>
-                <td class="px-6 py-4">
-                  <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded border border-blue-200">Usuario</span>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="flex items-center">
-                    <div class="h-2.5 w-2.5 rounded-full bg-red-500 mr-2"></div> Suspendido
-                  </div>
-                </td>
-                <td class="px-6 py-4">28/05/2026</td>
-                <td class="px-6 py-4 text-right space-x-2">
-                  <button class="text-gray-400 hover:text-gray-700 transition-colors" title="Configurar Usuario" onclick="document.getElementById('edit-user-modal').classList.remove('hidden')"><i class="fas fa-cog"></i></button>
-                  <button class="text-gray-400 hover:text-primary-500 transition-colors" title="Editar Rol"><i class="fas fa-user-edit"></i></button>
-                  <button class="text-red-500 hover:text-red-700 transition-colors" title="Reactivar"><i class="fas fa-undo"></i></button>
-                </td>
-              </tr>
+            <tbody id="usuarios-tbody">
+              <!-- Content will be dynamically populated by dashboard-usuarios.js -->
             </tbody>
           </table>
         </div>
@@ -270,13 +182,18 @@
         </button>
       </div>
       <div class="p-6 space-y-4">
+        <input type="hidden" id="edit-user-id">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
-          <input type="text" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" value="Martín Soto">
+          <input type="text" id="edit-user-name" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-          <input type="email" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" value="martin.soto@email.com">
+          <input type="email" id="edit-user-email" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Nacimiento</label>
+          <input type="date" id="edit-user-birthdate" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors">
         </div>
         <div class="pt-2">
           <div class="flex gap-2 text-sm text-primary-600 bg-primary-50 p-3 rounded-lg border border-primary-100">
@@ -287,12 +204,12 @@
       </div>
       <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
         <button onclick="document.getElementById('edit-user-modal').classList.add('hidden')" class="px-4 py-2 text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors font-medium">Cancelar</button>
-        <button onclick="document.getElementById('edit-user-modal').classList.add('hidden')" class="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors font-medium shadow-sm shadow-primary-500/30">Guardar Cambios</button>
+        <button id="btn-save-user" class="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors font-medium shadow-sm shadow-primary-500/30 flex items-center justify-center min-w-[150px]">Guardar Cambios</button>
       </div>
     </div>
   </div>
 
-  <script src="../js/dashboard-usuarios.js"></script>
+  <script type="module" src="../js/dashboard-usuarios.js"></script>
 </body>
 </html>
 

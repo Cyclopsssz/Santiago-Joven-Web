@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es" class="scroll-smooth">
 
 <head>
@@ -92,10 +92,7 @@
           <h1 class="text-xl font-semibold text-gray-800">Programas Institucionales</h1>
         </div>
         <div class="flex items-center gap-4">
-          <button class="text-gray-500 hover:text-primary-500 transition-colors p-2 rounded-full hover:bg-gray-100 relative">
-            <i class="fas fa-bell"></i>
-          </button>
-          <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
+          <div class="flex items-center gap-3">
             <div class="text-right hidden sm:block">
               <p class="text-sm font-semibold text-gray-800">Admin</p>
               <p class="text-xs text-gray-500">Oficina de Juventud</p>
@@ -113,7 +110,7 @@
       <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 class="text-2xl font-bold text-gray-800 mb-1">Gestión de Programas Institucionales</h2>
-          <p class="text-gray-600">Administra los programas gubernamentales (Senda, Lazos).</p>
+          <p class="text-gray-600">Administra los programas.</p>
         </div>
         <div class="flex gap-3">
           <button id="add-programa-btn" class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium flex items-center gap-2">
@@ -123,7 +120,7 @@
       </div>
 
       <!-- Stats Row -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 mb-8">
         <div class="bg-white rounded-xl p-5 border border-gray-100 dashboard-card">
           <div class="flex items-center justify-between mb-3">
             <span class="text-sm text-gray-500 font-medium">Programas Activos</span>
@@ -132,24 +129,6 @@
             </div>
           </div>
           <p class="text-3xl font-bold text-gray-800" id="active-count">0</p>
-        </div>
-        <div class="bg-white rounded-xl p-5 border border-gray-100 dashboard-card">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-sm text-gray-500 font-medium">Total Inscritos</span>
-            <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
-              <i class="fas fa-user-plus"></i>
-            </div>
-          </div>
-          <p class="text-3xl font-bold text-gray-800" id="total-enrolled">0</p>
-        </div>
-        <div class="bg-white rounded-xl p-5 border border-gray-100 dashboard-card">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-sm text-gray-500 font-medium">Sesiones Realizadas</span>
-            <div class="w-10 h-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
-              <i class="fas fa-chalkboard-teacher"></i>
-            </div>
-          </div>
-          <p class="text-3xl font-bold text-gray-800" id="total-sessions">0</p>
         </div>
         <div class="bg-white rounded-xl p-5 border border-gray-100 dashboard-card">
           <div class="flex items-center justify-between mb-3">
