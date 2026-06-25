@@ -1,4 +1,4 @@
-﻿import { supabase } from './api.js';
+import { supabase } from './api.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   let messages = [];
@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const messageCount = document.getElementById('message-count');
   const searchInput = document.getElementById('search-messages');
   const statusFilter = document.getElementById('status-filter');
+  const typeFilter = document.getElementById('type-filter');
 
   // Modal References
   const modal = document.getElementById('message-modal');
@@ -21,6 +22,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const toggleReadBtn = document.getElementById('toggle-read-btn');
   const replyBtn = document.getElementById('reply-mailto-btn');
   const deleteBtn = document.getElementById('delete-message-btn');
+  const unbanBtn = document.getElementById('unban-user-btn');
+  const appealActionsContainer = document.getElementById('appeal-actions-container');
+  const unbanReasonInput = document.getElementById('unban-reason-input');
 
   let currentMessageId = null;
 
@@ -52,15 +56,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   function renderTable() {
     const searchTerm = searchInput.value.toLowerCase().trim();
     const filterStatus = statusFilter.value;
+    const filterType = typeFilter ? typeFilter.value : 'all';
 
     const filtered = messages.filter(msg => {
       const nombre = msg.nombre || '';
       const email = msg.email || '';
       const matchSearch = nombre.toLowerCase().includes(searchTerm) || email.toLowerCase().includes(searchTerm);
+      
       let matchStatus = true;
       if (filterStatus === 'unread') matchStatus = !msg.leido;
       if (filterStatus === 'read') matchStatus = msg.leido;
-      return matchSearch && matchStatus;
+      
+      let matchType = true;
+      if (filterType !== 'all') {
+         const msgType = msg.tipo || 'General';
+         matchType = msgType === filterType;
+      }
+      
+      return matchSearch && matchStatus && matchType;
     });
 
     if (filtered.length === 0) {
@@ -107,6 +120,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           <td class="px-6 py-4 max-w-xs truncate text-gray-600 ${fontClass}">
             ${extracto}
           </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="text-xs font-medium px-2.5 py-0.5 rounded ${msg.tipo === 'Apelación de Baneo' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}">${msg.tipo || 'General'}</span>
+          </td>
           <td class="px-6 py-4 whitespace-nowrap text-gray-500 text-sm">
             ${dateFormatted}
           </td>
@@ -142,6 +158,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     modalBody.textContent = msg.mensaje;
 
     updateModalStatusBadge(msg.leido);
+    
+    if (appealActionsContainer && unbanReasonInput) {
+      if (msg.tipo === 'Apelación de Baneo') {
+        appealActionsContainer.classList.remove('hidden');
+        unbanReasonInput.value = ''; // Limpiar textarea al abrir
+      } else {
+        appealActionsContainer.classList.add('hidden');
+      }
+    }
     
     replyBtn.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${msg.email}&su=Respuesta%20desde%20Apoyo%20Joven`;
     replyBtn.target = '_blank';
@@ -217,6 +242,78 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   searchInput.addEventListener('input', renderTable);
   statusFilter.addEventListener('change', renderTable);
+  if (typeFilter) typeFilter.addEventListener('change', renderTable);
+
+  if (unbanBtn) {
+    unbanBtn.addEventListener('click', async () => {
+      if (!currentMessageId) return;
+      const msg = messages.find(m => m.id === currentMessageId);
+      if (!msg) return;
+
+      const motivoRevocacion = unbanReasonInput ? unbanReasonInput.value.trim() : 'Apelación aprobada desde panel de mensajes';
+      
+      if (!motivoRevocacion) {
+          alert('Por favor, ingresa el motivo de la revocación.');
+          return;
+      }
+
+      if (!confirm(`¿Estás seguro de revocar el baneo de ${msg.email}?`)) return;
+      
+      const originalText = unbanBtn.innerHTML;
+      unbanBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Revocando...';
+      unbanBtn.disabled = true;
+      
+      try {
+          // 1. Encontrar el user_id usando el email
+          const { data: perfiles, error: perfError } = await supabase.from('perfiles').select('id, estado').eq('correo', msg.email).limit(1);
+          if (perfError || !perfiles || perfiles.length === 0) throw new Error('Usuario no encontrado en la base de datos');
+          
+          const userId = perfiles[0].id;
+          
+          if (perfiles[0].estado !== 'Suspendido') {
+              alert('Este usuario no está suspendido actualmente.');
+          } else {
+              // 2. Revocar en el historial
+              const { data: userData } = await supabase.auth.getUser();
+              const adminId = userData?.user?.id || null;
+              
+              const { error: histError } = await supabase.from('historial_baneos')
+                  .update({ 
+                      estado_sancion: 'revocado',
+                      motivo_revocacion: motivoRevocacion,
+                      admin_revocador_id: adminId
+                  })
+                  .eq('user_id', userId)
+                  .eq('estado_sancion', 'activo');
+              
+              if (histError) throw histError;
+
+              // 3. Reactivar perfil
+              const { error: updError } = await supabase.from('perfiles').update({ estado: 'Activo' }).eq('id', userId);
+              if (updError) throw updError;
+              
+              alert('El baneo ha sido revocado exitosamente.');
+          }
+          
+          // 4. Marcar mensaje como leido
+          if (!msg.leido) {
+              msg.leido = true;
+              updateModalStatusBadge(true);
+              await supabase.from('contacto').update({ leido: true }).eq('id', msg.id);
+          }
+          
+          closeModalHandler();
+          renderTable();
+          
+      } catch(err) {
+          console.error(err);
+          alert('Hubo un error al revocar el baneo: ' + err.message);
+      } finally {
+          unbanBtn.innerHTML = originalText;
+          unbanBtn.disabled = false;
+      }
+    });
+  }
 
   // ==================== INIT ====================
   await fetchMessages();

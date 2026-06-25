@@ -1,56 +1,21 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // ==================== DATA (MOCKS SEPARADOS) ====================
-  const eventosDB = [
-    {
-      id: 1,
-      name: 'Reforestación Cerro Santa Lucía',
-      icon: 'fas fa-tree',
-      color: 'secondary',
-      date: '2026-07-15',
-      timeStart: '09:00',
-      timeEnd: '13:00',
-      location: 'Cerro Santa Lucía, Entrada Alameda',
-      description: 'Actividad de limpieza y plantación de flora nativa. Se recomienda traer ropa cómoda y agua.',
-      enrolled: 45,
-      maxCapacity: 50,
-      active: true,
-    },
-    {
-      id: 2,
-      name: 'Colecta Banco de Alimentos',
-      icon: 'fas fa-box-open',
-      color: 'accent',
-      date: '2026-08-01',
-      timeStart: '10:00',
-      timeEnd: '18:00',
-      location: 'Plaza de Armas',
-      description: 'Campaña de recolección de alimentos no perecibles para comedores solidarios de la comuna.',
-      enrolled: 120,
-      maxCapacity: null, // Sin límite
-      active: true,
-    },
-    {
-      id: 3,
-      name: 'Pintatón Mural Comunitario',
-      icon: 'fas fa-paint-roller',
-      color: 'primary',
-      date: '2026-06-20',
-      timeStart: '15:00',
-      timeEnd: '19:00',
-      location: 'Barrio Yungay, Esquina Esperanza con Huérfanos',
-      description: 'Recuperación de espacios públicos mediante muralismo junto a artistas locales.',
-      enrolled: 30,
-      maxCapacity: 30,
-      active: false,
-    }
-  ];
+import { supabase } from './api.js';
+
+function initDashboard() {
+  let eventosDB = [];
+  let inscripcionesDB = [];
+  let currentEditingId = null;
 
   // ==================== COLOR CONFIG ====================
   const colorConfig = {
     primary: { bg: 'bg-blue-50', text: 'text-primary-600', icon: 'bg-blue-100 text-primary-600', border: 'border-primary-500' },
     secondary: { bg: 'bg-green-50', text: 'text-secondary-600', icon: 'bg-green-100 text-secondary-600', border: 'border-secondary-500' },
     accent: { bg: 'bg-orange-50', text: 'text-accent-600', icon: 'bg-orange-100 text-accent-600', border: 'border-accent-500' },
-    red: { bg: 'bg-red-50', text: 'text-red-600', icon: 'bg-red-100 text-red-600', border: 'border-red-500' },
+  };
+
+  const iconsByColor = {
+    primary: 'fas fa-hands-helping',
+    secondary: 'fas fa-tree',
+    accent: 'fas fa-bullhorn'
   };
 
   // ==================== DOM ====================
@@ -70,17 +35,52 @@ document.addEventListener('DOMContentLoaded', () => {
   // Form elements
   const formTitle = document.getElementById('form-evento-title');
   const form = document.getElementById('form-evento');
+  const btnSave = document.getElementById('save-form-evento-btn');
+
+  // ==================== DATA FETCH ====================
+  async function loadData() {
+    if (!eventosGrid) return;
+    eventosGrid.innerHTML = '<div class="col-span-2 text-center py-10 text-gray-500"><i class="fas fa-spinner fa-spin text-3xl"></i> Cargando eventos...</div>';
+    try {
+      // 1. Obtener eventos
+      const { data: eventos, error: errEventos } = await supabase
+        .from('eventos_voluntariado')
+        .select('*')
+        .order('fecha', { ascending: true });
+      if (errEventos) throw errEventos;
+      eventosDB = eventos || [];
+
+      // 2. Obtener inscripciones
+      const { data: inscripciones, error: errInsc } = await supabase
+        .from('inscripciones_voluntariado')
+        .select('evento_id');
+      if (errInsc) throw errInsc;
+      
+      inscripcionesDB = inscripciones || [];
+
+      renderUI();
+    } catch (err) {
+      console.error(err);
+      eventosGrid.innerHTML = '<div class="col-span-2 text-center py-10 text-red-500">Error al cargar los datos. Revisa los permisos de Supabase.</div>';
+    }
+  }
 
   // ==================== RENDER ====================
+  function getEnrolledCount(eventoId) {
+    return inscripcionesDB.filter(i => i.evento_id === eventoId).length;
+  }
+
   function updateStats() {
-    activeCount.textContent = eventosDB.filter(p => p.active).length;
-    totalEnrolled.textContent = eventosDB.reduce((sum, p) => sum + (p.enrolled || 0), 0);
+    if (activeCount) activeCount.textContent = eventosDB.filter(p => p.activo).length;
+    if (totalEnrolled) totalEnrolled.textContent = inscripcionesDB.length;
   }
 
   function createCardHTML(p) {
     const cfg = colorConfig[p.color] || colorConfig.accent;
-    const dateFormatted = new Date(p.date).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' });
-    const capacityText = p.maxCapacity ? `${p.enrolled}/${p.maxCapacity}` : `${p.enrolled} (Sin límite)`;
+    const iconClass = iconsByColor[p.color] || iconsByColor.accent;
+    const dateFormatted = new Date(p.fecha + 'T12:00:00').toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' });
+    const enrolled = getEnrolledCount(p.id);
+    const capacityText = p.cupos ? `${enrolled}/${p.cupos}` : `${enrolled} (Sin límite)`;
     
     return `
       <div class="bg-white rounded-xl border border-gray-100 overflow-hidden dashboard-card relative group" data-id="${p.id}">
@@ -98,15 +98,15 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="flex items-start justify-between mb-4 pr-20">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-lg ${cfg.icon} flex items-center justify-center flex-shrink-0">
-                <i class="${p.icon} text-xl"></i>
+                <i class="${iconClass} text-xl"></i>
               </div>
               <div>
-                <h3 class="font-bold text-gray-800 text-lg line-clamp-1" title="${p.name}">${p.name}</h3>
-                <p class="text-xs text-gray-500 line-clamp-1"><i class="fas fa-calendar-alt mr-1"></i> ${dateFormatted} • ${p.timeStart}</p>
+                <h3 class="font-bold text-gray-800 text-lg line-clamp-1" title="${p.titulo}">${p.titulo}</h3>
+                <p class="text-xs text-gray-500 line-clamp-1"><i class="fas fa-calendar-alt mr-1"></i> ${dateFormatted} • ${p.hora_inicio.slice(0,5)}</p>
               </div>
             </div>
           </div>
-          <p class="text-gray-600 text-sm mb-5 h-10 line-clamp-2">${p.description}</p>
+          <p class="text-gray-600 text-sm mb-5 h-10 line-clamp-2">${p.descripcion || 'Sin descripción'}</p>
           <div class="flex items-center gap-6 text-sm mb-4">
             <div class="flex items-center gap-2">
               <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
@@ -122,12 +122,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <i class="fas fa-map-marker-alt text-xs"></i>
               </div>
               <div>
-                <p class="text-gray-500 text-xs line-clamp-1 max-w-[100px]" title="${p.location}">${p.location}</p>
+                <p class="text-gray-500 text-xs line-clamp-1 max-w-[100px]" title="${p.lugar}">${p.lugar}</p>
               </div>
             </div>
             <div class="flex items-center gap-2 ml-auto">
-              <button class="toggle-btn relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${p.active ? 'bg-green-500' : 'bg-gray-300'}" data-id="${p.id}" title="${p.active ? 'Pausar Inscripciones' : 'Activar Inscripciones'}">
-                <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${p.active ? 'translate-x-6' : 'translate-x-1'}"></span>
+              <button class="toggle-btn relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${p.activo ? 'bg-green-500' : 'bg-gray-300'}" data-id="${p.id}" title="${p.activo ? 'Pausar Inscripciones' : 'Activar Inscripciones'}">
+                <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${p.activo ? 'translate-x-6' : 'translate-x-1'}"></span>
               </button>
             </div>
           </div>
@@ -142,7 +142,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderUI() {
-    eventosGrid.innerHTML = eventosDB.map(p => createCardHTML(p)).join('');
+    if (!eventosGrid) return;
+    if (eventosDB.length === 0) {
+      eventosGrid.innerHTML = '<div class="col-span-2 text-center py-10 text-gray-500">No hay eventos creados. Añade uno nuevo.</div>';
+    } else {
+      eventosGrid.innerHTML = eventosDB.map(p => createCardHTML(p)).join('');
+    }
     updateStats();
   }
 
@@ -151,16 +156,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const p = eventosDB.find(pr => pr.id === id);
     if (!p) return;
     const cfg = colorConfig[p.color] || colorConfig.accent;
-    const dateFormatted = new Date(p.date).toLocaleDateString('es-CL', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+    const iconClass = iconsByColor[p.color] || iconsByColor.accent;
+    const dateFormatted = new Date(p.fecha + 'T12:00:00').toLocaleDateString('es-CL', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+    const enrolled = getEnrolledCount(p.id);
 
-    modalTitle.textContent = p.name;
-    modalBody.innerHTML = `
+    if (modalTitle) modalTitle.textContent = p.titulo;
+    if (modalBody) modalBody.innerHTML = `
       <div class="flex items-center gap-3 mb-4">
         <div class="w-12 h-12 rounded-lg ${cfg.icon} flex items-center justify-center text-xl">
-          <i class="${p.icon}"></i>
+          <i class="${iconClass}"></i>
         </div>
         <div>
-          <span class="text-xs font-medium px-2 py-0.5 rounded ${p.active ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${p.active ? 'Inscripciones Abiertas' : 'Inscripciones Cerradas'}</span>
+          <span class="text-xs font-medium px-2 py-0.5 rounded ${p.activo ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${p.activo ? 'Inscripciones Abiertas' : 'Inscripciones Cerradas'}</span>
         </div>
       </div>
       
@@ -168,44 +175,48 @@ document.addEventListener('DOMContentLoaded', () => {
         <div>
           <h4 class="text-sm font-semibold text-gray-700 flex items-center gap-2"><i class="fas fa-clock text-gray-400"></i> Cuándo</h4>
           <p class="text-gray-600 text-sm ml-6">${dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1)}</p>
-          <p class="text-gray-600 text-sm ml-6">${p.timeStart} a ${p.timeEnd || 'Término por definir'}</p>
+          <p class="text-gray-600 text-sm ml-6">${p.hora_inicio.slice(0,5)} a ${p.hora_fin ? p.hora_fin.slice(0,5) : 'Término por definir'}</p>
         </div>
         
         <div>
           <h4 class="text-sm font-semibold text-gray-700 flex items-center gap-2"><i class="fas fa-map-pin text-gray-400"></i> Dónde</h4>
-          <p class="text-gray-600 text-sm ml-6">${p.location}</p>
+          <p class="text-gray-600 text-sm ml-6">${p.lugar}</p>
         </div>
 
         <div>
           <h4 class="text-sm font-semibold text-gray-700 flex items-center gap-2"><i class="fas fa-info-circle text-gray-400"></i> Descripción y Requisitos</h4>
-          <p class="text-gray-600 text-sm ml-6 whitespace-pre-wrap">${p.description}</p>
+          <p class="text-gray-600 text-sm ml-6 whitespace-pre-wrap">${p.descripcion || 'Sin descripción detallada.'}</p>
         </div>
       </div>
 
       <div class="mt-6 bg-blue-50 rounded-lg p-4 flex justify-between items-center">
         <div>
           <p class="text-sm font-semibold text-primary-700">Voluntarios Inscritos</p>
-          <p class="text-xs text-primary-600">${p.maxCapacity ? `Cupo máximo: ${p.maxCapacity}` : 'Sin límite de cupos'}</p>
+          <p class="text-xs text-primary-600">${p.cupos ? 'Cupo máximo: ' + p.cupos : 'Sin límite de cupos'}</p>
         </div>
         <div class="text-2xl font-black text-primary-600">
-          ${p.enrolled}
+          ${enrolled}
         </div>
       </div>
     `;
-    detailModal.classList.remove('hidden');
+    if (detailModal) detailModal.classList.remove('hidden');
   }
 
   function closeAllModals() {
-    detailModal.classList.add('hidden');
-    formEventoModal.classList.add('hidden');
+    if (detailModal) detailModal.classList.add('hidden');
+    if (formEventoModal) formEventoModal.classList.add('hidden');
+    currentEditingId = null;
   }
 
   // Eventos de apertura de modales de creación
-  addEventoBtn.addEventListener('click', () => {
-    form.reset();
-    formTitle.textContent = 'Añadir Evento';
-    formEventoModal.classList.remove('hidden');
-  });
+  if (addEventoBtn) {
+    addEventoBtn.addEventListener('click', () => {
+      if (form) form.reset();
+      currentEditingId = null;
+      if (formTitle) formTitle.textContent = 'Añadir Evento';
+      if (formEventoModal) formEventoModal.classList.remove('hidden');
+    });
+  }
 
   // Eventos de cierre en modales
   const closeSelectors = [
@@ -222,21 +233,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Cierre por clic fuera del modal
   [detailModal, formEventoModal].forEach(m => {
-    m.addEventListener('click', (e) => {
-      if (e.target === m) closeAllModals();
-    });
+    if (m) {
+      m.addEventListener('click', (e) => {
+        if (e.target === m) closeAllModals();
+      });
+    }
   });
 
   // ==================== DELEGATED EVENTS ====================
-  document.addEventListener('click', (e) => {
+  document.addEventListener('click', async (e) => {
     // Toggle Activo/Inactivo
     const toggleBtn = e.target.closest('.toggle-btn');
     if (toggleBtn) {
-      const id = parseInt(toggleBtn.dataset.id);
+      const id = toggleBtn.dataset.id;
       const p = eventosDB.find(pr => pr.id === id);
       if (p) {
-        p.active = !p.active;
-        renderUI();
+        const newVal = !p.activo;
+        try {
+            await supabase.from('eventos_voluntariado').update({ activo: newVal }).eq('id', id);
+            p.activo = newVal;
+            renderUI();
+        } catch(err) {
+            console.error(err);
+        }
       }
       return;
     }
@@ -244,38 +263,101 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ver Detalles
     const detailBtn = e.target.closest('.detail-btn');
     if (detailBtn) {
-      openDetail(parseInt(detailBtn.dataset.id));
+      openDetail(detailBtn.dataset.id);
       return;
     }
 
     // Botón Editar
     const editBtn = e.target.closest('.edit-btn');
     if (editBtn) {
-      formTitle.textContent = 'Editar Evento';
-      formEventoModal.classList.remove('hidden');
+      const id = editBtn.dataset.id;
+      const p = eventosDB.find(pr => pr.id === id);
+      if(p) {
+          if (formTitle) formTitle.textContent = 'Editar Evento';
+          currentEditingId = id;
+          const setVal = (sel, val) => { const el = document.getElementById(sel); if(el) el.value = val; };
+          setVal('ev-titulo', p.titulo);
+          setVal('ev-fecha', p.fecha);
+          setVal('ev-hora-inicio', p.hora_inicio.slice(0,5));
+          setVal('ev-hora-fin', p.hora_fin ? p.hora_fin.slice(0,5) : '');
+          setVal('ev-lugar', p.lugar);
+          setVal('ev-descripcion', p.descripcion || '');
+          setVal('ev-cupos', p.cupos || '');
+          setVal('ev-color', p.color || 'accent');
+          if (formEventoModal) formEventoModal.classList.remove('hidden');
+      }
       return;
     }
 
     // Botón Eliminar
     const delBtn = e.target.closest('.delete-btn');
     if (delBtn) {
-      if(confirm('¿Estás seguro que deseas eliminar este evento? (Simulación visual)')) {
-        const id = parseInt(delBtn.dataset.id);
-        const idx = eventosDB.findIndex(x => x.id === id);
-        if(idx !== -1) eventosDB.splice(idx, 1);
-        renderUI();
+      if(confirm('¿Estás seguro que deseas eliminar este evento? Se borrarán también las inscripciones asociadas.')) {
+        const id = delBtn.dataset.id;
+        try {
+            if (btnSave) btnSave.disabled = true;
+            await supabase.from('eventos_voluntariado').delete().eq('id', id);
+            await loadData();
+        } catch(err) {
+            console.error(err);
+            alert('Error eliminando');
+        } finally {
+            if (btnSave) btnSave.disabled = false;
+        }
       }
       return;
     }
   });
 
-  // Eventos de guardado (Prevent default para que no recargue)
-  document.getElementById('save-form-evento-btn').addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Simulación: Evento guardado exitosamente.');
-    closeAllModals();
-  });
+  // Eventos de guardado
+  if (btnSave) {
+    btnSave.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (form && !form.checkValidity()) {
+          form.reportValidity();
+          return;
+      }
+
+      const getVal = (id) => document.getElementById(id)?.value;
+      const payload = {
+          titulo: getVal('ev-titulo'),
+          fecha: getVal('ev-fecha'),
+          hora_inicio: getVal('ev-hora-inicio') + ':00',
+          hora_fin: getVal('ev-hora-fin') ? getVal('ev-hora-fin') + ':00' : null,
+          lugar: getVal('ev-lugar'),
+          descripcion: getVal('ev-descripcion'),
+          cupos: getVal('ev-cupos') ? parseInt(getVal('ev-cupos')) : null,
+          color: getVal('ev-color') || 'accent'
+      };
+
+      btnSave.textContent = 'Guardando...';
+      btnSave.disabled = true;
+
+      try {
+          if (currentEditingId) {
+              await supabase.from('eventos_voluntariado').update(payload).eq('id', currentEditingId);
+          } else {
+              payload.activo = true;
+              await supabase.from('eventos_voluntariado').insert([payload]);
+          }
+          closeAllModals();
+          await loadData();
+      } catch(err) {
+          console.error(err);
+          alert('Hubo un error al guardar.');
+      } finally {
+          btnSave.textContent = 'Guardar Cambios';
+          btnSave.disabled = false;
+      }
+    });
+  }
 
   // ==================== INIT ====================
-  renderUI();
-});
+  loadData();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDashboard);
+} else {
+  initDashboard();
+}

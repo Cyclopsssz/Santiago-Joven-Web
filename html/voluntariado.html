@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voluntariados - Santiago Joven</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'sans': ['Poppins', 'sans-serif'],
+          },
+          colors: {
+            'primary': {
+              '500': '#0ea5e9',
+              '600': '#0284c7',
+            },
+            'secondary': {
+              '500': '#10b981',
+              '600': '#059669',
+            },
+            'accent': {
+              '500': '#f97316',
+              '600': '#ea580c',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link href="../css/styles.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans antialiased flex flex-col min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-white/90 backdrop-blur-md shadow-sm fixed w-full z-50 top-0 transition-all duration-300">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="bg-primary-500 text-white p-2 rounded-xl shadow-lg group-hover:scale-105 transition-transform">
+          <i class="fas fa-hands-helping text-xl"></i>
+        </div>
+        <span class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-secondary-500">
+          Santiago Joven
+        </span>
+      </a>
+      
+      <!-- User Profile (Will be handled by auth.js or similar, simplified here) -->
+      <div id="user-profile-menu" class="hidden flex items-center gap-4">
+        <a href="dashboard-usuarios.html" class="text-gray-600 hover:text-primary-500 transition-colors font-medium">Mi Perfil</a>
+        <button id="btn-logout-vol" class="text-red-500 hover:text-red-600 transition-colors">
+            <i class="fas fa-sign-out-alt text-lg"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="pt-32 pb-16 bg-gradient-to-br from-primary-600 to-secondary-600 text-white relative overflow-hidden">
+    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1593113514676-591702f3bc17?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-10 mix-blend-overlay"></div>
+    <div class="container mx-auto px-6 text-center relative z-10">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">Acción Joven: Voluntariados</h1>
+      <p class="text-lg md:text-xl text-primary-100 max-w-2xl mx-auto">Únete a nuestra red de voluntarios y haz la diferencia en tu comuna. Explora las actividades disponibles e inscríbete con un clic.</p>
+    </div>
+  </section>
+
+  <!-- Contenido Principal -->
+  <main class="flex-grow container mx-auto px-6 py-12">
+    
+    <div id="loading-spinner" class="text-center py-20">
+      <i class="fas fa-spinner fa-spin text-4xl text-primary-500 mb-4"></i>
+      <p class="text-gray-500 font-medium">Cargando eventos...</p>
+    </div>
+
+    <div id="error-message" class="text-center py-20 hidden">
+      <div class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h2 class="text-xl font-bold text-gray-800 mb-2">Oops! Algo salió mal</h2>
+      <p class="text-gray-500 mb-6">No pudimos cargar los voluntariados. Por favor intenta de nuevo.</p>
+      <a href="index.html" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium">Volver al Inicio</a>
+    </div>
+
+    <div id="empty-state" class="text-center py-20 hidden">
+      <div class="w-20 h-20 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+        <i class="fas fa-calendar-times"></i>
+      </div>
+      <h2 class="text-xl font-bold text-gray-800 mb-2">No hay eventos activos</h2>
+      <p class="text-gray-500 mb-6">Actualmente no tenemos voluntariados con inscripciones abiertas. ¡Vuelve pronto!</p>
+      <a href="index.html" class="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium">Volver al Inicio</a>
+    </div>
+
+    <!-- Grid de Eventos -->
+    <div id="voluntariados-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 hidden">
+      <!-- Llenado dinámicamente por JS -->
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white pt-16 pb-8 border-t border-gray-800">
+    <div class="container mx-auto px-6 text-center text-gray-500 text-sm border-t border-gray-800 pt-8 mt-8">
+      <p>&copy; 2026 Ilustre Municipalidad de Santiago. Oficina de Juventud.</p>
+    </div>
+  </footer>
+
+  <!-- Modal Detalle Evento -->
+  <div id="evento-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
+        <h3 id="evento-modal-title" class="text-xl font-bold text-gray-800">Detalles del Evento</h3>
+        <button id="close-evento-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto">
+        <div id="evento-modal-body" class="space-y-4">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+      <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0">
+        <button id="close-evento-modal-btn" class="px-4 py-2 text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors font-medium">Cerrar</button>
+        <button id="inscribirme-btn" class="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-bold shadow-md">¡Inscribirme!</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/voluntariado.js?v=2"></script>
+</body>
+</html>

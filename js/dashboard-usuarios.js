@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputEmail = document.getElementById('edit-user-email');
     const inputBirthdate = document.getElementById('edit-user-birthdate');
     const btnSave = document.getElementById('btn-save-user');
+    
+    const banModal = document.getElementById('ban-user-modal');
+    const unbanModal = document.getElementById('unban-user-modal');
+    const banDurationContainer = document.getElementById('ban-duration-container');
+    const banCustomDateContainer = document.getElementById('ban-custom-date-container');
 
     let allUsers = [];
 
@@ -30,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Función global para abrir el modal desde el HTML generado dinámicamente
-    window.openEditModal = (userId) => {
+    window.openEditModal = async (userId) => {
         const user = allUsers.find(u => u.id === userId);
         if (!user) return;
         
@@ -40,6 +45,39 @@ document.addEventListener('DOMContentLoaded', () => {
         inputEmail.value = user.correo || '';
         inputBirthdate.value = user.fecha_nacimiento || ''; // Formato esperado para input date: YYYY-MM-DD
         
+        // Cargar historial de infracciones
+        const historyContainer = document.getElementById('user-ban-history');
+        if (historyContainer) {
+            historyContainer.innerHTML = '<p class="text-gray-500 text-center py-2">Cargando historial...</p>';
+            try {
+                const { data, error } = await supabase
+                    .from('historial_baneos')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('fecha_inicio', { ascending: false });
+                
+                if (error) throw error;
+                if (data && data.length > 0) {
+                    historyContainer.innerHTML = data.map(b => `
+                        <div class="p-3 bg-white border border-gray-200 rounded-lg">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="font-semibold ${b.estado_sancion === 'activo' ? 'text-red-600' : 'text-gray-700'}">${b.categoria_razon}</span>
+                                <span class="text-xs px-2 py-0.5 rounded ${b.estado_sancion === 'activo' ? 'bg-red-100 text-red-700' : (b.estado_sancion === 'revocado' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700')}">${b.estado_sancion.toUpperCase()}</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mb-1">Tipo: ${b.tipo_sancion} | Fecha: ${new Date(b.fecha_inicio).toLocaleDateString()}</p>
+                            ${b.nota_interna ? `<p class="text-gray-700 italic border-l-2 border-gray-300 pl-2 mt-2">${b.nota_interna}</p>` : ''}
+                            ${b.motivo_revocacion ? `<p class="text-green-700 italic border-l-2 border-green-300 pl-2 mt-2 text-xs">Revocado: ${b.motivo_revocacion}</p>` : ''}
+                        </div>
+                    `).join('');
+                } else {
+                    historyContainer.innerHTML = '<p class="text-gray-500 text-center py-2">El usuario no tiene infracciones previas.</p>';
+                }
+            } catch (err) {
+                console.error(err);
+                historyContainer.innerHTML = '<p class="text-red-500 text-center py-2">Error al cargar historial.</p>';
+            }
+        }
+
         // Mostrar el modal
         editModal.classList.remove('hidden');
     };
@@ -153,7 +191,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="text-gray-400 hover:text-primary-500 transition-colors" title="Editar Rol" onclick="window.toggleUserRole('${user.id}', '${user.rol || 'Usuario'}')">
                     <i class="fas fa-user-edit"></i>
                 </button>
-                <button class="text-${user.estado === 'Suspendido' ? 'red' : 'gray'}-400 hover:text-${user.estado === 'Suspendido' ? 'red' : 'gray'}-700 transition-colors" title="${user.estado === 'Suspendido' ? 'Reactivar' : 'Suspender'}"><i class="fas fa-${user.estado === 'Suspendido' ? 'undo' : 'ban'}"></i></button>
+                <button class="text-${user.estado === 'Suspendido' ? 'red' : 'gray'}-400 hover:text-${user.estado === 'Suspendido' ? 'red' : 'gray'}-700 transition-colors" title="${user.estado === 'Suspendido' ? 'Reactivar' : 'Suspender'}" onclick="window.manageUserStatus('${user.id}', '${user.estado}')">
+                    <i class="fas fa-${user.estado === 'Suspendido' ? 'undo' : 'ban'}"></i>
+                </button>
             </td>
         `;
         return tr;
@@ -218,12 +258,186 @@ document.addEventListener('DOMContentLoaded', () => {
                 counter.textContent = `Mostrando ${allUsers.length} usuarios`;
             }
 
+            // update metrics
+            const metricTotal = document.getElementById('metric-total-users');
+            const metricAge = document.getElementById('metric-avg-age');
+            const metricSuspended = document.getElementById('metric-suspended-users');
+
+            if (metricTotal && metricAge && metricSuspended) {
+                metricTotal.textContent = allUsers.length;
+
+                let suspendedCount = 0;
+                let validAgesCount = 0;
+                let totalAge = 0;
+
+                allUsers.forEach(user => {
+                    if (user.estado === 'Suspendido') suspendedCount++;
+                    
+                    const age = calculateAge(user.fecha_nacimiento);
+                    if (age !== 'N/A') {
+                        totalAge += age;
+                        validAgesCount++;
+                    }
+                });
+
+                metricSuspended.textContent = suspendedCount;
+                metricAge.textContent = validAgesCount > 0 ? Math.round(totalAge / validAgesCount) + ' años' : 'N/A';
+            }
+
         } catch (error) {
             console.error('Error al cargar usuarios:', error);
             if (tbody) {
                 tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Error al cargar usuarios. Verifica los permisos de Supabase.</td></tr>';
             }
         }
+    }
+
+    // Lógica para Modales de Baneo y Desbaneo
+    window.manageUserStatus = (userId, estado) => {
+        if (estado === 'Suspendido') {
+            document.getElementById('unban-user-id').value = userId;
+            document.getElementById('unban-reason').value = '';
+            unbanModal.classList.remove('hidden');
+        } else {
+            document.getElementById('ban-user-id').value = userId;
+            document.getElementById('ban-type').value = 'temporal';
+            document.getElementById('ban-duration').value = '24h';
+            document.getElementById('ban-reason').value = 'Spam';
+            document.getElementById('ban-note').value = '';
+            document.getElementById('ban-custom-date').value = '';
+            banDurationContainer.classList.remove('hidden');
+            banCustomDateContainer.classList.add('hidden');
+            banModal.classList.remove('hidden');
+        }
+    };
+
+    const banTypeEl = document.getElementById('ban-type');
+    const banDurationEl = document.getElementById('ban-duration');
+    if (banTypeEl) {
+        banTypeEl.addEventListener('change', (e) => {
+            if (e.target.value === 'permanente') {
+                banDurationContainer.classList.add('hidden');
+                banCustomDateContainer.classList.add('hidden');
+            } else {
+                banDurationContainer.classList.remove('hidden');
+                if (banDurationEl.value === 'custom') {
+                    banCustomDateContainer.classList.remove('hidden');
+                }
+            }
+        });
+    }
+
+    if (banDurationEl) {
+        banDurationEl.addEventListener('change', (e) => {
+            if (e.target.value === 'custom') {
+                banCustomDateContainer.classList.remove('hidden');
+            } else {
+                banCustomDateContainer.classList.add('hidden');
+            }
+        });
+    }
+
+    const btnConfirmBan = document.getElementById('btn-confirm-ban');
+    if (btnConfirmBan) {
+        btnConfirmBan.addEventListener('click', async () => {
+            const userId = document.getElementById('ban-user-id').value;
+            const tipoSancion = document.getElementById('ban-type').value;
+            const duration = document.getElementById('ban-duration').value;
+            const customDate = document.getElementById('ban-custom-date').value;
+            const categoria = document.getElementById('ban-reason').value;
+            const nota = document.getElementById('ban-note').value;
+
+            // Calcular fecha de fin
+            let fechaFin = null;
+            if (tipoSancion === 'temporal') {
+                const now = new Date();
+                if (duration === '24h') now.setDate(now.getDate() + 1);
+                else if (duration === '7d') now.setDate(now.getDate() + 7);
+                else if (duration === '30d') now.setDate(now.getDate() + 30);
+                else if (duration === 'custom') {
+                    if (!customDate) return alert('Debes seleccionar una fecha de fin personalizada.');
+                    fechaFin = new Date(customDate);
+                }
+                if (duration !== 'custom') fechaFin = now;
+            }
+
+            btnConfirmBan.disabled = true;
+            btnConfirmBan.textContent = 'Aplicando...';
+
+            try {
+                // Conseguir ID del admin actual (simulado o real desde auth)
+                const { data: userData } = await supabase.auth.getUser();
+                const adminId = userData?.user?.id || null;
+
+                // 1. Guardar en historial
+                const { error: histError } = await supabase.from('historial_baneos').insert({
+                    user_id: userId,
+                    admin_id: adminId,
+                    tipo_sancion: tipoSancion,
+                    categoria_razon: categoria,
+                    nota_interna: nota,
+                    fecha_fin: fechaFin ? fechaFin.toISOString() : null,
+                    estado_sancion: 'activo'
+                });
+                if (histError) throw histError;
+
+                // 2. Actualizar perfil a Suspendido
+                const { error: perfError } = await supabase.from('perfiles').update({ estado: 'Suspendido' }).eq('id', userId);
+                if (perfError) throw perfError;
+
+                banModal.classList.add('hidden');
+                await loadUsers();
+            } catch (err) {
+                console.error(err);
+                alert('Hubo un error al aplicar la sanción.');
+            } finally {
+                btnConfirmBan.disabled = false;
+                btnConfirmBan.textContent = 'Aplicar Sanción';
+            }
+        });
+    }
+
+    const btnConfirmUnban = document.getElementById('btn-confirm-unban');
+    if (btnConfirmUnban) {
+        btnConfirmUnban.addEventListener('click', async () => {
+            const userId = document.getElementById('unban-user-id').value;
+            const motivo = document.getElementById('unban-reason').value;
+
+            if (!motivo) return alert('Debes escribir un motivo de revocación.');
+
+            btnConfirmUnban.disabled = true;
+            btnConfirmUnban.textContent = 'Revocando...';
+
+            try {
+                const { data: userData } = await supabase.auth.getUser();
+                const adminId = userData?.user?.id || null;
+
+                // 1. Revocar registros activos en el historial
+                const { error: histError } = await supabase.from('historial_baneos')
+                    .update({ 
+                        estado_sancion: 'revocado',
+                        motivo_revocacion: motivo,
+                        admin_revocador_id: adminId
+                    })
+                    .eq('user_id', userId)
+                    .eq('estado_sancion', 'activo');
+                
+                if (histError) throw histError;
+
+                // 2. Cambiar perfil a Activo
+                const { error: perfError } = await supabase.from('perfiles').update({ estado: 'Activo' }).eq('id', userId);
+                if (perfError) throw perfError;
+
+                unbanModal.classList.add('hidden');
+                await loadUsers();
+            } catch (err) {
+                console.error(err);
+                alert('Hubo un error al revocar la sanción.');
+            } finally {
+                btnConfirmUnban.disabled = false;
+                btnConfirmUnban.textContent = 'Revocar y Reactivar';
+            }
+        });
     }
 
     loadUsers();

@@ -168,6 +168,64 @@ export const initAuth = () => {
                     // Asignar rol desde la base de datos (user_metadata)
                     userRole = data.user.user_metadata?.role === 'admin' ? 'admin' : 'comun';
 
+                    // Verificación de Sanciones (Fase B)
+                    try {
+                        const { data: perfilData } = await supabase.from('perfiles').select('estado').eq('id', data.user.id).single();
+                        
+                        if (perfilData && perfilData.estado === 'Suspendido') {
+                            const { data: banData } = await supabase.from('historial_baneos')
+                                .select('*')
+                                .eq('user_id', data.user.id)
+                                .eq('estado_sancion', 'activo')
+                                .order('fecha_inicio', { ascending: false })
+                                .limit(1)
+                                .single();
+                            
+                            let isStillBanned = true;
+                            
+                            if (banData && banData.tipo_sancion === 'temporal' && banData.fecha_fin) {
+                                const fin = new Date(banData.fecha_fin);
+                                if (new Date() > fin) {
+                                    isStillBanned = false; // El castigo expiró naturalmente
+                                    await supabase.from('historial_baneos').update({estado_sancion: 'cumplido'}).eq('id', banData.id);
+                                    await supabase.from('perfiles').update({estado: 'Activo'}).eq('id', data.user.id);
+                                } else {
+                                    document.getElementById('banned-duration').textContent = 'Temporal (Hasta ' + fin.toLocaleDateString() + ' a las ' + fin.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + ')';
+                                }
+                            } else if (banData && banData.tipo_sancion === 'permanente') {
+                                document.getElementById('banned-duration').textContent = 'Permanente';
+                            } else {
+                                document.getElementById('banned-duration').textContent = 'No especificado';
+                            }
+                            
+                            if (isStillBanned) {
+                                document.getElementById('banned-reason').textContent = banData?.categoria_razon || 'Violación de los términos de servicio';
+                                
+                                const noteContainer = document.getElementById('banned-note-container');
+                                const noteText = document.getElementById('banned-note');
+                                if (banData?.nota_interna && noteContainer && noteText) {
+                                    noteText.textContent = `"${banData.nota_interna}"`;
+                                    noteContainer.classList.remove('hidden');
+                                } else if (noteContainer) {
+                                    noteContainer.classList.add('hidden');
+                                }
+
+                                document.getElementById('appeal-email').value = email;
+                                document.getElementById('appeal-name').value = nombreUsuario;
+                                
+                                const bannedOverlay = document.getElementById('banned-overlay');
+                                if (bannedOverlay) bannedOverlay.classList.remove('hidden');
+                                
+                                await supabase.auth.signOut();
+                                closeAuthModal();
+                                statusDiv.classList.add('hidden');
+                                return; // Interceptar el login impidiendo que continue
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Error revisando estado de sanción:', err);
+                    }
+
                     // Mostrar botón de dashboard si corresponde
                     const dashboardBtn = document.getElementById('admin-dashboard-btn');
                     if (userRole === 'admin') {
@@ -270,6 +328,63 @@ export const initAuth = () => {
             } catch (error) {
                 console.error(error);
                 showStatusMessage(statusDiv, 'error de conexion', false);
+            }
+        });
+    }
+
+    // Lógica para Formulario de Apelaciones
+    const btnShowAppeal = document.getElementById('btn-show-appeal');
+    const appealModal = document.getElementById('appeal-modal');
+    const btnCloseAppeal = document.getElementById('btn-close-appeal');
+    const appealForm = document.getElementById('appeal-form');
+
+    if (btnShowAppeal && appealModal) {
+        btnShowAppeal.addEventListener('click', () => {
+            appealModal.classList.remove('hidden');
+        });
+    }
+
+    if (btnCloseAppeal && appealModal) {
+        btnCloseAppeal.addEventListener('click', () => {
+            appealModal.classList.add('hidden');
+        });
+    }
+
+    if (appealForm) {
+        appealForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('appeal-email').value;
+            const name = document.getElementById('appeal-name').value;
+            const msg = document.getElementById('appeal-message').value;
+            const statusDiv = document.getElementById('appeal-status');
+
+            statusDiv.textContent = 'Enviando...';
+            statusDiv.classList.remove('hidden', 'text-green-500', 'text-red-500');
+            statusDiv.classList.add('text-primary-500', 'block');
+
+            try {
+                const { error } = await supabase.from('contacto').insert({
+                    nombre: name,
+                    email: email,
+                    mensaje: msg,
+                    tipo: 'Apelación de Baneo'
+                });
+
+                if (error) throw error;
+
+                statusDiv.textContent = 'Apelación enviada correctamente. Un moderador la revisará.';
+                statusDiv.classList.replace('text-primary-500', 'text-green-500');
+                appealForm.reset();
+                setTimeout(() => {
+                    appealModal.classList.add('hidden');
+                    statusDiv.classList.add('hidden');
+                    statusDiv.classList.remove('block');
+                }, 3000);
+
+            } catch (error) {
+                console.error(error);
+                statusDiv.textContent = 'Hubo un error al enviar tu apelación.';
+                statusDiv.classList.replace('text-primary-500', 'text-red-500');
             }
         });
     }

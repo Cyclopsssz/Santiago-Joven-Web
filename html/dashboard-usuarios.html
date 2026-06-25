@@ -113,6 +113,37 @@
         </div>
       </div>
 
+      <!-- Metrics Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white rounded-xl p-6 border border-gray-100 flex items-center gap-4 dashboard-card">
+          <div class="w-12 h-12 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-xl shadow-sm">
+            <i class="fas fa-users"></i>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500 font-medium">Total de Jóvenes</p>
+            <p class="text-2xl font-bold text-gray-800" id="metric-total-users">0</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl p-6 border border-gray-100 flex items-center gap-4 dashboard-card">
+          <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl shadow-sm">
+            <i class="fas fa-birthday-cake"></i>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500 font-medium">Promedio de Edad</p>
+            <p class="text-2xl font-bold text-gray-800" id="metric-avg-age">0 años</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl p-6 border border-gray-100 flex items-center gap-4 dashboard-card">
+          <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xl shadow-sm">
+            <i class="fas fa-user-slash"></i>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500 font-medium">Usuarios Suspendidos</p>
+            <p class="text-2xl font-bold text-gray-800" id="metric-suspended-users">0</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Filters & Search Bar -->
       <div class="bg-white rounded-xl p-4 border border-gray-100 mb-6 flex flex-col md:flex-row gap-4 items-center justify-between dashboard-card">
         <div class="relative w-full md:w-96">
@@ -196,15 +227,106 @@
           <input type="date" id="edit-user-birthdate" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors">
         </div>
         <div class="pt-2">
-          <div class="flex gap-2 text-sm text-primary-600 bg-primary-50 p-3 rounded-lg border border-primary-100">
+          <div class="flex gap-2 text-sm text-primary-600 bg-primary-50 p-3 rounded-lg border border-primary-100 mb-4">
             <i class="fas fa-info-circle mt-0.5"></i>
             <p>Esta sección te permitirá modificar los datos básicos de la cuenta directamente en la base de datos.</p>
+          </div>
+          <hr class="border-gray-200 mb-4">
+          <h4 class="font-semibold text-gray-800 mb-2">Historial de Infracciones</h4>
+          <div id="user-ban-history" class="space-y-3 max-h-40 overflow-y-auto text-sm">
+            <!-- Renderizado dinámicamente -->
+            <p class="text-gray-500 text-center py-2">Cargando historial...</p>
           </div>
         </div>
       </div>
       <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
         <button onclick="document.getElementById('edit-user-modal').classList.add('hidden')" class="px-4 py-2 text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors font-medium">Cancelar</button>
         <button id="btn-save-user" class="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors font-medium shadow-sm shadow-primary-500/30 flex items-center justify-center min-w-[150px]">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Baneo -->
+  <div id="ban-user-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-red-50">
+        <h3 class="text-lg font-bold text-red-700">Suspender Cuenta</h3>
+        <button onclick="document.getElementById('ban-user-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <input type="hidden" id="ban-user-id">
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Sanción</label>
+          <select id="ban-type" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500">
+            <option value="temporal">Baneo Temporal</option>
+            <option value="permanente">Baneo Permanente</option>
+          </select>
+        </div>
+
+        <div id="ban-duration-container">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Duración</label>
+          <select id="ban-duration" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500">
+            <option value="24h">24 Horas</option>
+            <option value="7d">7 Días</option>
+            <option value="30d">30 Días</option>
+            <option value="custom">Personalizado</option>
+          </select>
+        </div>
+        
+        <div id="ban-custom-date-container" class="hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Fin (Personalizada)</label>
+          <input type="date" id="ban-custom-date" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Motivo / Categoría</label>
+          <select id="ban-reason" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500">
+            <option value="Spam">Spam o Publicidad</option>
+            <option value="Ofensivo">Lenguaje Ofensivo</option>
+            <option value="Nombre Inapropiado">Nombre Inapropiado</option>
+            <option value="Abuso">Abuso del Sistema</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nota Interna (Detalles)</label>
+          <textarea id="ban-note" rows="3" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500 resize-none" placeholder="Escribe los detalles de la infracción..."></textarea>
+        </div>
+      </div>
+      <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+        <button onclick="document.getElementById('ban-user-modal').classList.add('hidden')" class="px-4 py-2 text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors font-medium">Cancelar</button>
+        <button id="btn-confirm-ban" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium shadow-sm shadow-red-500/30">Aplicar Sanción</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Desbaneo (Revocación) -->
+  <div id="unban-user-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-green-50">
+        <h3 class="text-lg font-bold text-green-700">Revocar Castigo</h3>
+        <button onclick="document.getElementById('unban-user-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <input type="hidden" id="unban-user-id">
+        <div class="flex gap-2 text-sm text-yellow-700 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+          <i class="fas fa-exclamation-triangle mt-0.5"></i>
+          <p>Estás a punto de levantar el castigo de este usuario antes de tiempo. Esto debe quedar registrado.</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Motivo de la Revocación</label>
+          <textarea id="unban-reason" rows="3" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-green-500 focus:ring-1 focus:ring-green-500 resize-none" placeholder="Ej: Apelación aprobada, falso positivo..."></textarea>
+        </div>
+      </div>
+      <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+        <button onclick="document.getElementById('unban-user-modal').classList.add('hidden')" class="px-4 py-2 text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors font-medium">Cancelar</button>
+        <button id="btn-confirm-unban" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium shadow-sm shadow-green-500/30">Revocar y Reactivar</button>
       </div>
     </div>
   </div>

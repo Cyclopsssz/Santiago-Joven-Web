@@ -355,8 +355,8 @@
               <p class="text-gray-600 mb-6">Participa en campañas de reforestación, visitas a hogares de ancianos,
                 colectas de alimentos y más. Conecta con otros jóvenes que, como tú, quieren dejar una huella positiva.
               </p>
-              <button class="btn btn-accent requires-auth enroll-btn"
-                data-title="Programa de Voluntariado Juvenil" data-id="voluntariado" data-type="programa">¡Quiero ser voluntario!</button>
+              <a href="voluntariado.html" target="_blank"
+                class="btn btn-accent requires-auth inline-block text-center">¡Quiero ser voluntario!</a>
             </div>
           </div>
         </div>
@@ -773,11 +773,76 @@
     </div>
   </div>
 
+  <!-- Modal de Cuenta Suspendida -->
+  <div id="banned-overlay"
+    class="fixed inset-0 bg-red-900/95 backdrop-blur-md z-[200] flex items-center justify-center p-4 hidden transition-opacity">
+    <div
+      class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col transform transition-transform duration-300">
+      <div class="px-6 py-8 text-center bg-red-50 border-b border-red-100">
+        <div class="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-ban text-4xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-red-700 mb-2">Tu cuenta ha sido suspendida</h2>
+        <p class="text-red-600/80">No tienes permitido acceder a la plataforma.</p>
+      </div>
+      <div class="p-6 md:p-8 space-y-4">
+        <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+          <p class="text-sm text-gray-500 mb-1">Motivo de la sanción</p>
+          <p id="banned-reason" class="font-semibold text-gray-800 text-lg">Cargando...</p>
+        </div>
+        <div id="banned-note-container" class="bg-red-50/50 rounded-xl p-4 border border-red-100 hidden">
+          <p class="text-sm text-red-800/70 mb-1 font-medium">Nota del Moderador</p>
+          <p id="banned-note" class="text-red-900 text-sm italic">Cargando...</p>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+          <p class="text-sm text-gray-500 mb-1">Estado de la sanción</p>
+          <p id="banned-duration" class="font-semibold text-gray-800 text-lg">Cargando...</p>
+        </div>
+        <p class="text-sm text-gray-500 text-center pt-4">¿Crees que esto es un error?</p>
+        <button id="btn-show-appeal"
+          class="w-full py-3 px-4 border-2 border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 font-semibold rounded-xl transition-all">
+          Apelar Sanción
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Apelación -->
+  <div id="appeal-modal"
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[210] flex items-center justify-center p-4 hidden transition-opacity">
+    <div
+      class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col transform transition-transform duration-300">
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <h3 class="text-lg font-bold text-gray-800">Enviar Apelación</h3>
+        <button id="btn-close-appeal" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <form id="appeal-form" class="p-6 space-y-4">
+        <p class="text-sm text-gray-600 mb-4">Explícanos por qué crees que tu cuenta debería ser reactivada. Un
+          moderador revisará tu caso.</p>
+        <input type="hidden" id="appeal-email">
+        <input type="hidden" id="appeal-name">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tu Mensaje</label>
+          <textarea id="appeal-message" rows="4"
+            class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-3 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 resize-none"
+            placeholder="Escribe aquí tu apelación..." required></textarea>
+        </div>
+        <div id="appeal-status" class="text-sm text-center font-medium hidden"></div>
+        <button type="submit"
+          class="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-primary-500/30 transition-all">
+          Enviar a Soporte
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- Contenedor Dinámico para Modales -->
   <div id="modales-container"></div>
 
   <!-- Scripts -->
-  <script type="module" src="../js/main.js"></script>
+  <script type="module" src="../js/main.js?v=1"></script>
   <script type="module" src="../js/programas.js"></script>
 </body>
 
