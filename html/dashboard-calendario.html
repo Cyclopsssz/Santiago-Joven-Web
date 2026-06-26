@@ -133,6 +133,13 @@
             <option value="curso">Cursos</option>
             <option value="campana">Campañas</option>
           </select>
+          <input type="date" id="date-filter" class="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block p-2.5 outline-none flex-1 md:flex-none" title="Filtrar por fecha específica">
+          <select id="status-filter" class="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block p-2.5 outline-none flex-1 md:flex-none">
+            <option value="all">Todos los estados</option>
+            <option value="proximo">Próximos</option>
+            <option value="hoy">Es Hoy</option>
+            <option value="finalizado">Finalizados</option>
+          </select>
         </div>
       </div>
 
@@ -145,6 +152,7 @@
                 <th scope="col" class="px-6 py-4">Evento</th>
                 <th scope="col" class="px-6 py-4">Tipo</th>
                 <th scope="col" class="px-6 py-4">Fecha</th>
+                <th scope="col" class="px-6 py-4">Cupos</th>
                 <th scope="col" class="px-6 py-4">Estado</th>
                 <th scope="col" class="px-6 py-4 text-right">Acciones</th>
               </tr>
@@ -192,6 +200,10 @@
           <label for="event-date" class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
           <input type="date" id="event-date" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" required>
         </div>
+        <div>
+          <label for="event-descripcion" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+          <textarea id="event-descripcion" rows="3" class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-2.5 outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors" placeholder="Detalles sobre el evento..." required></textarea>
+        </div>
         
         <div class="flex items-center gap-2 mt-4">
           <input type="checkbox" id="event-has-cupos" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500">
@@ -229,7 +241,7 @@
     </div>
   </div>
 
-  <script type="module" src="../js/dashboard-calendario.js"></script>
+  <script type="module" src="../js/dashboard-calendario.js?v=2"></script>
 </body>
 </html>
 

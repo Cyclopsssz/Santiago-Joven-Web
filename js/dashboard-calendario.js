@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const eventCount = document.getElementById('event-count');
   const searchInput = document.getElementById('search-events');
   const typeFilter = document.getElementById('type-filter');
+  const dateFilter = document.getElementById('date-filter');
+  const statusFilter = document.getElementById('status-filter');
   const addEventBtn = document.getElementById('add-event-btn');
 
   // Modal Add/Edit
@@ -18,6 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const eventTitleInput = document.getElementById('event-title');
   const eventTypeInput = document.getElementById('event-type');
   const eventDateInput = document.getElementById('event-date');
+  const eventDescripcionInput = document.getElementById('event-descripcion');
   const eventHasCupos = document.getElementById('event-has-cupos');
   const eventCupos = document.getElementById('event-cupos');
   const cuposContainer = document.getElementById('cupos-container');
@@ -63,6 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       title: ev.titulo || 'Sin título',
       type: ev.tipo || 'feria',
       date: ev.fecha ? ev.fecha.split('T')[0] : '', // YYYY-MM-DD
+      descripcion: ev.descripcion || '',
       hasCupos: !!ev.tiene_cupo,
       cupos: ev.cupos
     }));
@@ -74,11 +78,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   function renderTable() {
     const searchTerm = searchInput.value.toLowerCase().trim();
     const filterType = typeFilter.value;
+    const filterDate = dateFilter.value;
+    const filterStatus = statusFilter.value;
 
     const filtered = events.filter(ev => {
       const matchSearch = ev.title.toLowerCase().includes(searchTerm);
       const matchType = filterType === 'all' || ev.type === filterType;
-      return matchSearch && matchType;
+      const matchDate = !filterDate || ev.date === filterDate;
+      
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const eventDate = new Date(ev.date + 'T00:00:00');
+      const isPast = eventDate < today;
+      const isToday = eventDate.getTime() === today.getTime();
+      
+      let evStatus = 'proximo';
+      if (isPast) evStatus = 'finalizado';
+      else if (isToday) evStatus = 'hoy';
+      
+      const matchStatus = filterStatus === 'all' || evStatus === filterStatus;
+
+      return matchSearch && matchType && matchDate && matchStatus;
     });
 
     if (filtered.length === 0) {
@@ -108,6 +128,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       today.setHours(0, 0, 0, 0);
       const eventDate = new Date(ev.date + 'T00:00:00');
       const isPast = eventDate < today;
+      const isToday = eventDate.getTime() === today.getTime();
 
       return `
         <tr class="bg-white border-b hover:bg-gray-50 transition-colors" data-id="${ev.id}">
@@ -126,12 +147,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             <i class="fas fa-calendar-day mr-1 text-gray-400"></i>${dateFormatted}
           </td>
           <td class="px-6 py-4">
+            ${ev.hasCupos ? `<span class="font-medium text-gray-800">${ev.cupos}</span>` : `<span class="bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-0.5 rounded border border-gray-200">Liberado</span>`}
+          </td>
+          <td class="px-6 py-4">
             <div class="flex items-center">
-              <div class="h-2.5 w-2.5 rounded-full ${isPast ? 'bg-gray-400' : 'bg-green-500'} mr-2"></div>
-              ${isPast ? 'Finalizado' : 'Próximo'}
+              <div class="h-2.5 w-2.5 rounded-full ${isPast ? 'bg-gray-400' : (isToday ? 'bg-yellow-500' : 'bg-green-500')} mr-2"></div>
+              ${isPast ? 'Finalizado' : (isToday ? 'Es Hoy' : 'Próximo')}
             </div>
           </td>
           <td class="px-6 py-4 text-right space-x-2">
+            <button class="details-btn text-gray-400 hover:text-blue-500 transition-colors" title="Ver Detalles" data-id="${ev.id}">
+              <i class="fas fa-eye"></i>
+            </button>
             <button class="edit-btn text-gray-400 hover:text-primary-500 transition-colors" title="Editar" data-id="${ev.id}">
               <i class="fas fa-pen"></i>
             </button>
@@ -222,10 +249,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const title = eventTitleInput.value.trim();
     const type = eventTypeInput.value;
     const date = eventDateInput.value;
+    const descripcion = eventDescripcionInput.value.trim();
     const hasCupos = eventHasCupos.checked;
     const cupos = hasCupos ? parseInt(eventCupos.value) : null;
 
-    if (!title || !type || !date || (hasCupos && !cupos)) {
+    if (!title || !type || !date || !descripcion || (hasCupos && !cupos)) {
       showFormStatus('Por favor completa todos los campos requeridos', false);
       return;
     }
@@ -238,6 +266,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       titulo: title,
       tipo: type,
       fecha: date,
+      descripcion: descripcion,
       tiene_cupo: hasCupos,
       cupos: cupos,
       created_at: new Date().toISOString()
@@ -293,8 +322,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Edit / Delete via table delegation
   tableBody.addEventListener('click', (e) => {
+    const detailsBtn = e.target.closest('.details-btn');
     const editBtn = e.target.closest('.edit-btn');
     const deleteBtn = e.target.closest('.delete-btn');
+
+    if (detailsBtn) {
+      const id = detailsBtn.dataset.id;
+      window.location.href = `dashboard-calendario-detalles.html?id=${id}`;
+    }
 
     if (editBtn) {
       const id = editBtn.dataset.id;
@@ -306,6 +341,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       eventTitleInput.value = ev.title;
       eventTypeInput.value = ev.type;
       eventDateInput.value = ev.date;
+      eventDescripcionInput.value = ev.descripcion;
       eventEditId.value = ev.id;
       
       eventHasCupos.checked = !!ev.hasCupos;
@@ -331,6 +367,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Filters
   searchInput.addEventListener('input', renderTable);
   typeFilter.addEventListener('change', renderTable);
+  dateFilter.addEventListener('change', renderTable);
+  statusFilter.addEventListener('change', renderTable);
 
   // ==================== INIT ====================
   await fetchEvents();

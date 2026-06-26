@@ -48,6 +48,29 @@ export const initAuth = () => {
 
     let currentModal = loginModal;
 
+    // Restaurar sesión al recargar la página
+    supabase.auth.getUser().then(({ data }) => {
+        if (data && data.user) {
+            currentUser = data.user.user_metadata?.nombre || data.user.email.split('@')[0];
+            currentUserEmail = data.user.email;
+            currentUserId = data.user.id;
+            userRole = data.user.user_metadata?.role === 'admin' ? 'admin' : 'comun';
+
+            if (openLoginBtn) {
+                openLoginBtn.textContent = `Salir (${currentUser})`;
+                openLoginBtn.classList.remove('bg-primary-500', 'text-white');
+                openLoginBtn.classList.add('text-primary-500', 'font-bold', 'border-2', 'border-primary-500');
+            }
+            if (mobileOpenLoginBtn) {
+                mobileOpenLoginBtn.textContent = `Salir (${currentUser})`;
+            }
+            const dashboardBtn = document.getElementById('admin-dashboard-btn');
+            if (userRole === 'admin' && dashboardBtn) {
+                dashboardBtn.classList.remove('hidden');
+            }
+        }
+    });
+
     // calculo de inclinacion 3d
     const handleTiltEffect = (e) => {
         if (!currentModal || authModalsContainer.classList.contains('hidden')) return;
@@ -244,6 +267,8 @@ export const initAuth = () => {
                         if (mobileOpenLoginBtn) {
                             mobileOpenLoginBtn.textContent = `Salir (${currentUser})`;
                         }
+
+                        window.dispatchEvent(new Event('auth-status-changed'));
 
                     }, 2000);
 
