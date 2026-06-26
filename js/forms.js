@@ -62,7 +62,8 @@ export const initForms = () => {
                     intereses: interesesMarcados,
                     calificacion: rating,
                     problematica: problema,
-                    sugerencia: sugerencia
+                    sugerencia: sugerencia,
+                    user_id: currentUserId
                 }]);
 
                 if (!error) {
