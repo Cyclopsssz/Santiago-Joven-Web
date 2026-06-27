@@ -172,7 +172,7 @@
     <header class="bg-white w-full sticky top-0 z-40 shadow-sm">
       <div class="w-full px-4 lg:px-8 py-4 flex justify-between items-center">
         <div class="flex items-center gap-8">
-          <a href="#inicio" class="text-3xl font-bold text-primary-500 flex-shrink-0">Apoyo Joven</a>
+          <a href="#inicio" id="site-logo-text" class="text-3xl font-bold text-primary-500 flex-shrink-0">Apoyo Joven</a>
           <a href="dashboard.html" target="_blank" id="admin-dashboard-btn"
             class="text-primary-500 hover:text-primary-600 bg-primary-50 hover:bg-primary-100 p-2 rounded-lg transition-colors duration-200 flex items-center justify-center hidden"
             title="Dashboard">
@@ -255,7 +255,7 @@
         <div class="container mx-auto max-w-7xl text-center">
           <h1 class="text-4xl md:text-6xl font-bold mb-6 drop-shadow-lg">Apoyo Joven: Crece, participa y aprende</h1>
           <p class="text-xl md:text-2xl mb-12 max-w-3xl mx-auto opacity-90">
-            Tu espacio para encontrar orientación, capacitarte en nuevas habilidades y conectar con tu comunidad.
+            <span id="site-hero-description">Tu espacio para encontrar orientación, capacitarte en nuevas habilidades y conectar con tu comunidad.</span>
             <br class="hidden md:block">
             <strong>Dirigido a jóvenes de 14 a 29 años.</strong>
           </p>
@@ -660,14 +660,13 @@
             <div>
               <h3 class="text-2xl font-semibold mb-6">Nuestra Ubicación</h3>
               <div class="space-y-4 text-lg text-gray-600">
-                <p><i class="fas fa-map-marker-alt w-6 text-center mr-2 text-primary-500"></i>HERRERA 360 (Centro
-                  Comunitario Santiago en Compañía)</p>
-                <p><i class="fas fa-clock w-6 text-center mr-2 text-primary-500"></i>Lunes a jueves [09:00 - 18:00 hrs]
-                  viernes [09:00 a 17:00 hrs]</p>
-                <p><i class="fas fa-envelope w-6 text-center mr-2 text-primary-500"></i>stgojoven@munistgo.cl</p>
+                <p><i class="fas fa-map-marker-alt w-6 text-center mr-2 text-primary-500"></i><span id="site-address-text">HERRERA 360 (Centro Comunitario Santiago en Compañía)</span></p>
+                <p><i class="fas fa-clock w-6 text-center mr-2 text-primary-500"></i><span id="site-hours-text">Lunes a jueves [09:00 - 18:00 hrs] viernes [09:00 a 17:00 hrs]</span></p>
+                <p><i class="fas fa-envelope w-6 text-center mr-2 text-primary-500"></i><span id="site-email-text">stgojoven@munistgo.cl</span></p>
               </div>
               <div class="mt-6 rounded-lg overflow-hidden shadow-lg h-64 md:h-96 w-full">
                 <iframe
+                  id="site-map-iframe"
                   src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d208.08130025488833!2d-70.67761944700538!3d-33.441468809849376!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses-419!2scl!4v1763749704959!5m2!1ses-419!2scl"
                   width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
                   referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -681,13 +680,10 @@
     <!-- ==================== PIE DE PÁGINA ==================== -->
     <footer class="bg-gray-800 text-gray-300 py-12 px-6">
       <div class="container mx-auto max-w-7xl text-center">
-        <h3 class="text-2xl font-bold text-white mb-4">Apoyo Joven</h3>
+        <h3 id="footer-logo-text" class="text-2xl font-bold text-white mb-4">Apoyo Joven</h3>
         <p class="mb-6">Crece, participa y aprende.</p>
-        <div class="flex justify-center space-x-6 text-2xl mb-8">
-          <a href="https://www.instagram.com/stgojoven?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
-            target="_blank" rel="noopener noreferrer" class="hover:text-accent-500 transition-colors">
-            <i class="fab fa-instagram"></i>
-          </a>
+        <div id="social-links-container" class="flex justify-center space-x-6 text-2xl mb-8">
+          <!-- Los links de redes sociales se cargarán aquí dinámicamente desde Supabase -->
         </div>
         <div class="border-t border-gray-700 pt-6 text-sm text-gray-500">
           &copy; 2025 Apoyo Joven. Todos los derechos reservados.
