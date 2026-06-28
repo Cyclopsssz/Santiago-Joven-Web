@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestión de Programas - Apoyo Joven</title>
+  <title>Gestión de Noticias - Apoyo Joven</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -56,7 +56,7 @@
       <a href="dashboard-calendario.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
         <i class="fas fa-calendar-alt"></i> Calendario
       </a>
-      <a href="dashboard-programas.html" class="flex items-center gap-3 px-4 py-3 bg-primary-50 text-primary-600 rounded-lg font-semibold">
+      <a href="dashboard-programas.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
         <i class="fas fa-bullhorn"></i> Programas
       </a>
       <a href="dashboard-servicios.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
@@ -68,7 +68,7 @@
       <a href="dashboard-mensajes.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
         <i class="fas fa-envelope"></i> Mensajes
       </a>
-      <a href="dashboard-noticias.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
+      <a href="dashboard-noticias.html" class="flex items-center gap-3 px-4 py-3 bg-primary-50 text-primary-600 rounded-lg font-semibold">
         <i class="fas fa-newspaper"></i> Noticias
       </a>
       <a href="dashboard-config.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary-500 rounded-lg transition-colors">
@@ -92,7 +92,7 @@
           <button class="md:hidden text-gray-500 hover:text-primary-500 text-xl">
             <i class="fas fa-bars"></i>
           </button>
-          <h1 class="text-xl font-semibold text-gray-800">Programas Institucionales</h1>
+          <h1 class="text-xl font-semibold text-gray-800">Noticias</h1>
         </div>
         <div class="flex items-center gap-4">
           <div class="flex items-center gap-3">
@@ -112,12 +112,12 @@
     <div class="p-6 md:p-8 flex-1">
       <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-1">Gestión de Programas Institucionales</h2>
-          <p class="text-gray-600">Administra los programas.</p>
+          <h2 class="text-2xl font-bold text-gray-800 mb-1">Gestión de Noticias</h2>
+          <p class="text-gray-600">Publica y administra las noticias que aparecen en la página principal.</p>
         </div>
         <div class="flex gap-3">
-          <button id="add-programa-btn" class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium flex items-center gap-2">
-            <i class="fas fa-plus"></i> Nuevo Programa
+          <button id="add-noticia-btn" class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium flex items-center gap-2">
+            <i class="fas fa-plus"></i> Nueva Noticia
           </button>
         </div>
       </div>
@@ -126,7 +126,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 mb-8">
         <div class="bg-white rounded-xl p-5 border border-gray-100 dashboard-card">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-sm text-gray-500 font-medium">Programas Activos</span>
+            <span class="text-sm text-gray-500 font-medium">Noticias Activas</span>
             <div class="w-10 h-10 rounded-lg bg-green-100 text-green-600 flex items-center justify-center">
               <i class="fas fa-check-circle"></i>
             </div>
@@ -135,93 +135,85 @@
         </div>
         <div class="bg-white rounded-xl p-5 border border-gray-100 dashboard-card">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-sm text-gray-500 font-medium">Programas Pausados</span>
+            <span class="text-sm text-gray-500 font-medium">Noticias Ocultas</span>
             <div class="w-10 h-10 rounded-lg bg-yellow-100 text-yellow-600 flex items-center justify-center">
-              <i class="fas fa-pause-circle"></i>
+              <i class="fas fa-eye-slash"></i>
             </div>
           </div>
-          <p class="text-3xl font-bold text-gray-800" id="paused-count">0</p>
+          <p class="text-3xl font-bold text-gray-800" id="hidden-count">0</p>
         </div>
       </div>
 
-      <!-- Programas Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12" id="programas-grid">
+      <!-- Noticias Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12" id="noticias-grid">
         <!-- Rendered by JS -->
       </div>
       
     </div>
   </main>
 
-  <!-- Modal de Detalle de Programa/Servicio -->
-  <div id="program-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity">
+  <!-- Modal de Detalle de Noticia -->
+  <div id="noticia-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
       <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
-        <h3 id="program-modal-title" class="text-lg font-bold text-gray-800">Detalles</h3>
-        <button id="close-program-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+        <h3 id="noticia-modal-title" class="text-lg font-bold text-gray-800">Detalles</h3>
+        <button id="close-noticia-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
           <i class="fas fa-times text-xl"></i>
         </button>
       </div>
       <div class="p-6 overflow-y-auto">
-        <div id="program-modal-body" class="space-y-4">
+        <div id="noticia-modal-body" class="space-y-4">
           <!-- Filled by JS -->
         </div>
       </div>
       <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end shrink-0">
-        <button id="close-program-modal-btn" class="px-4 py-2 text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors font-medium">Cerrar</button>
+        <button id="close-noticia-modal-btn" class="px-4 py-2 text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors font-medium">Cerrar</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal Formulario Programa -->
-  <div id="form-programa-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity">
+  <!-- Modal Formulario Noticia -->
+  <div id="form-noticia-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
       <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
-        <h3 id="form-programa-title" class="text-lg font-bold text-gray-800">Añadir/Editar Programa</h3>
-        <button id="close-form-programa" class="text-gray-400 hover:text-gray-600 transition-colors">
+        <h3 id="form-noticia-title" class="text-lg font-bold text-gray-800">Añadir Noticia</h3>
+        <button id="close-form-noticia" class="text-gray-400 hover:text-gray-600 transition-colors">
           <i class="fas fa-times text-xl"></i>
         </button>
       </div>
       <div class="p-6 overflow-y-auto">
-        <form id="form-programa" class="space-y-4">
+        <form id="form-noticia" class="space-y-4">
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Título del Programa *</label>
-            <input type="text" id="prog-titulo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Ej. Programa Senda" required>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Titular de la Noticia *</label>
+            <input type="text" id="noticia-titulo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Ej. Inauguración del nuevo centro juvenil" required>
           </div>
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Descripción Corta *</label>
-            <input type="text" id="prog-desc-corta" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Breve resumen para la tarjeta" required>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Descripción *</label>
+            <textarea id="noticia-descripcion" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Redacta el contenido de la noticia..." required></textarea>
           </div>
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Descripción Larga</label>
-            <textarea id="prog-desc-larga" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Todo el detalle de qué trata el programa"></textarea>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Icono (FontAwesome) <a href="https://fontawesome.com/search?o=r&m=free" target="_blank" class="text-primary-500 hover:underline font-normal text-xs ml-2 whitespace-nowrap"><i class="fas fa-external-link-alt"></i> Buscar iconos aquí</a></label>
-              <input type="text" id="prog-icono" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Ej. fas fa-shield-heart">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha *</label>
+              <input type="date" id="noticia-fecha" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" required>
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Color Tema</label>
-              <select id="prog-color" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                <option value="primary">Azul (Primary)</option>
-                <option value="secondary">Verde/Celeste (Secondary)</option>
-                <option value="accent">Naranja (Accent)</option>
-              </select>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">URL de Imagen</label>
+              <input type="url" id="noticia-imagen" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="https://ejemplo.com/imagen.jpg">
             </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Enlace Externo (opcional)</label>
+            <input type="url" id="noticia-enlace" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="https://ejemplo.com/noticia-completa">
           </div>
         </form>
       </div>
       <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0">
-        <button id="cancel-form-programa-btn" class="px-4 py-2 text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors font-medium">Cancelar</button>
-        <button id="save-form-programa-btn" class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium">Guardar Cambios</button>
+        <button id="cancel-form-noticia-btn" class="px-4 py-2 text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors font-medium">Cancelar</button>
+        <button id="save-form-noticia-btn" class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium">Guardar Noticia</button>
       </div>
     </div>
   </div>
 
-  <script type="module" src="../js/dashboard-programas.js"></script>
+  <script type="module" src="../js/dashboard-noticias.js"></script>
 </body>
 </html>
-
-
-
-

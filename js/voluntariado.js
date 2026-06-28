@@ -114,9 +114,6 @@ function initVoluntariado() {
                         <div class="h-2 w-full ${p.color === 'primary' ? 'bg-primary-500' : p.color === 'secondary' ? 'bg-secondary-500' : 'bg-accent-500'}"></div>
                         <div class="p-6 flex-grow">
                             <div class="flex items-center gap-4 mb-4">
-                                <div class="w-14 h-14 rounded-xl ${cfg.icon} flex items-center justify-center flex-shrink-0">
-                                    <i class="${iconClass} text-2xl"></i>
-                                </div>
                                 <div>
                                     <h3 class="font-bold text-gray-800 text-lg line-clamp-2">${p.titulo}</h3>
                                     <p class="text-sm text-gray-500"><i class="fas fa-calendar-alt mr-1"></i> ${dateFormatted} • ${p.hora_inicio.slice(0,5)}</p>
@@ -156,12 +153,6 @@ function initVoluntariado() {
 
         if (modalTitle) modalTitle.textContent = p.titulo;
         if (modalBody) modalBody.innerHTML = `
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-14 h-14 rounded-xl ${cfg.icon} flex items-center justify-center text-2xl">
-                    <i class="${iconClass}"></i>
-                </div>
-            </div>
-            
             <div class="space-y-4">
                 <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
                     <h4 class="text-sm font-bold text-gray-800 flex items-center gap-2 mb-1"><i class="fas fa-calendar-alt text-primary-500"></i> Fecha y Hora</h4>

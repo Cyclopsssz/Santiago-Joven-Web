@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>lunita</title>
+  <title>Santiago Joven</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -298,6 +298,8 @@
               <a href="#conexion-talleres" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Talleres</a>
             </div>
           </div>
+          <a href="#noticias"
+            class="nav-link px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">Noticias</a>
           <a href="#calendario"
             class="nav-link px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">Calendario</a>
           <a href="#encuestas"
@@ -396,6 +398,8 @@
             Mental</a>
           <a href="#conexion" class="mobile-nav-link text-lg text-gray-700 p-3 rounded-lg hover:bg-gray-100">Conexión
             Comunitaria</a>
+          <a href="#noticias"
+            class="mobile-nav-link text-lg text-gray-700 p-3 rounded-lg hover:bg-gray-100">Noticias</a>
           <a href="#calendario"
             class="mobile-nav-link text-lg text-gray-700 p-3 rounded-lg hover:bg-gray-100">Calendario</a>
           <a href="#encuestas"
@@ -599,7 +603,25 @@
           </div>
         </div>
       </section>
-      <section id="calendario" class="py-20 px-6 bg-light-bg">
+
+      <!-- ==================== SECCIÓN: NOTICIAS ==================== -->
+      <section id="noticias" class="py-20 px-6 bg-light-bg">
+        <div class="container mx-auto max-w-7xl">
+          <i class="fas fa-newspaper text-4xl text-accent-500 text-center w-full block mb-4"></i>
+          <h2 class="section-title">Noticias</h2>
+          <p class="section-subtitle">Mantente al día con las últimas novedades de la Oficina de la Juventud.</p>
+
+          <div id="noticias-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Las tarjetas de noticias se inyectarán aquí por JS -->
+            <div class="col-span-full text-center py-8 text-gray-500">
+              <i class="fas fa-spinner fa-spin text-2xl mb-3 block"></i>
+              Cargando noticias...
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="calendario" class="py-20 px-6 bg-white">
         <div class="container mx-auto max-w-7xl">
           <i class="fas fa-calendar-alt text-4xl text-secondary-500 text-center w-full block mb-4"></i>
           <h2 class="section-title">Calendario de Actividades</h2>

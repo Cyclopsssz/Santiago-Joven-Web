@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cargar configuracion global (redes y nombre)
     cargarConfiguracionSitio();
+
+    // Cargar noticias en la sección pública
+    cargarNoticias();
 });
 
 async function cargarConfiguracionSitio() {
@@ -87,5 +90,68 @@ async function cargarConfiguracionSitio() {
         container.innerHTML = html;
     } catch (e) {
         console.error('Error cargando la configuración del sitio:', e);
+    }
+}
+async function cargarNoticias() {
+    const grid = document.getElementById('noticias-grid');
+    if (!grid) return;
+
+    try {
+        const { data: noticias, error } = await supabase
+            .from('noticias')
+            .select('*')
+            .eq('activo', true)
+            .order('fecha', { ascending: false })
+            .limit(6);
+
+        if (error) {
+            console.error('Error cargando noticias:', error);
+            grid.innerHTML = '';
+            return;
+        }
+
+        if (!noticias || noticias.length === 0) {
+            grid.innerHTML = `<p class="col-span-full text-center text-gray-500 py-8 text-lg">No hay noticias publicadas por el momento.</p>`;
+            return;
+        }
+
+        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+        grid.innerHTML = noticias.map(n => {
+            const fecha = n.fecha ? new Date(n.fecha + 'T12:00:00') : new Date();
+            const fechaStr = `${fecha.getDate()} de ${meses[fecha.getMonth()]}, ${fecha.getFullYear()}`;
+
+            const imagenHTML = n.imagen_url
+                ? `<div class="h-48 w-full overflow-hidden">
+                     <img src="${n.imagen_url}" alt="${n.titulo}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.parentElement.innerHTML='<div class=\'h-full w-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center\'><i class=\'fas fa-newspaper text-white text-4xl\'></i></div>'">
+                   </div>`
+                : `<div class="h-48 w-full overflow-hidden">
+                     <div class="h-full w-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
+                       <i class="fas fa-newspaper text-white text-4xl"></i>
+                     </div>
+                   </div>`;
+
+            const enlaceBtn = n.enlace
+                ? `<a href="${n.enlace}" target="_blank" rel="noopener noreferrer" class="btn btn-outline border-accent-500 text-accent-500 hover:bg-accent-500 hover:text-white text-sm mt-auto">Leer más <i class="fas fa-external-link-alt ml-1"></i></a>`
+                : '';
+
+            return `
+                <div class="card p-0 overflow-hidden group flex flex-col transform hover:-translate-y-2 transition-all duration-300 hover:shadow-xl">
+                    ${imagenHTML}
+                    <div class="p-5 flex flex-col flex-grow">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-xs font-semibold text-accent-500 bg-orange-50 px-2 py-1 rounded-full"><i class="far fa-calendar-alt mr-1"></i>${fechaStr}</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-gray-800 mb-2 line-clamp-2">${n.titulo}</h4>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-3 flex-grow">${n.descripcion}</p>
+                        ${enlaceBtn}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+    } catch (e) {
+        console.error('Excepción al cargar noticias:', e);
+        grid.innerHTML = '';
     }
 }

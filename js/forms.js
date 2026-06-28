@@ -90,6 +90,12 @@ export const initForms = () => {
 
             const message = document.getElementById('contact-message').value;
 
+            if (!message.trim()) {
+                const statusDiv = document.getElementById('contact-status');
+                showStatusMessage(statusDiv, 'Por favor, escribe un mensaje antes de enviar.', false);
+                return;
+            }
+
             let finalName = currentUser;
             let finalEmail = currentUserEmail;
 

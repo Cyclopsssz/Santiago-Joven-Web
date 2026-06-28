@@ -222,7 +222,7 @@ export const initAuth = () => {
         if (loginStatus) {
             loginStatus.classList.add('hidden');
             loginStatus.textContent = '';
-            loginStatus.className = 'mt-4 text-center text-sm font-semibold p-3 rounded-lg hidden'; // Reset classes
+            loginStatus.className = 'hidden p-3 rounded-lg text-sm'; // Reset classes
         }
 
         // Restaurar UI Mobile
