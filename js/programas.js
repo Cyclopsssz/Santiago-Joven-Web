@@ -72,7 +72,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (filterCategory === 'destacado') {
                 filtered = servicios.filter(s => s.destacado === true);
             } else if (filterCategory !== 'all') {
-                filtered = servicios.filter(s => s.categoria === filterCategory);
+                const normalizedFilter = filterCategory.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                filtered = servicios.filter(s => {
+                    const normalizedItem = (s.categoria || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    return normalizedItem === normalizedFilter;
+                });
             }
 
             if (filtered.length === 0) {

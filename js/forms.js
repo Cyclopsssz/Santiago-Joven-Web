@@ -90,9 +90,25 @@ export const initForms = () => {
 
             const message = document.getElementById('contact-message').value;
 
+            let finalName = currentUser;
+            let finalEmail = currentUserEmail;
+
+            if (!currentUser) {
+                const nameInput = document.getElementById('contact-name');
+                const emailInput = document.getElementById('contact-email');
+                if (nameInput) finalName = nameInput.value;
+                if (emailInput) finalEmail = emailInput.value;
+
+                if (!finalName || !finalEmail) {
+                    const statusDiv = document.getElementById('contact-status');
+                    showStatusMessage(statusDiv, 'Por favor, ingresa tu nombre y correo.', false);
+                    return;
+                }
+            }
+
             const datosParaEnviar = {
-                nombre: currentUser || 'Usuario Logueado',
-                email: currentUserEmail || 'correo@ejemplo.com',
+                nombre: finalName,
+                email: finalEmail,
                 mensaje: message
             };
             const statusDiv = document.getElementById('contact-status');
@@ -133,21 +149,21 @@ export const initForms = () => {
         currentEnrollId = id;
         currentEnrollType = type;
         if (enrollCourseName) enrollCourseName.textContent = title;
-        
-        // Hide other modals just in case
-        document.getElementById('login-modal')?.classList.add('hidden');
-        document.getElementById('register-modal')?.classList.add('hidden');
-        document.getElementById('add-event-modal')?.classList.add('hidden');
 
-        if (authBackdrop) authBackdrop.classList.remove('hidden');
-        if (authModalsContainer) authModalsContainer.classList.remove('hidden');
+        const loginModal = document.getElementById('login-modal');
+        const registerModal = document.getElementById('register-modal');
+        if (loginModal) loginModal.classList.add('hidden', 'opacity-0', 'scale-95');
+        if (registerModal) registerModal.classList.add('hidden', 'opacity-0', 'scale-95');
+
+        if (authBackdrop) authBackdrop.classList.remove('pointer-events-none');
+        if (authModalsContainer) authModalsContainer.classList.remove('pointer-events-none');
         if (enrollModal) enrollModal.classList.remove('hidden');
 
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             if (authBackdrop) authBackdrop.classList.remove('opacity-0');
             if (authModalsContainer) authModalsContainer.classList.remove('opacity-0');
             if (enrollModal) enrollModal.classList.remove('scale-95', 'opacity-0');
-        }, 10);
+        });
         if (mainContent) mainContent.classList.add('blur-lg', 'pointer-events-none');
     };
 
@@ -157,9 +173,13 @@ export const initForms = () => {
         if (enrollModal) enrollModal.classList.add('scale-95', 'opacity-0');
         if (mainContent) mainContent.classList.remove('blur-lg', 'pointer-events-none');
         setTimeout(() => {
-            if (authBackdrop) authBackdrop.classList.add('hidden');
-            if (authModalsContainer) authModalsContainer.classList.add('hidden');
+            if (authBackdrop) authBackdrop.classList.add('pointer-events-none');
+            if (authModalsContainer) authModalsContainer.classList.add('pointer-events-none');
             if (enrollModal) enrollModal.classList.add('hidden');
+            
+            // Restore login modal state for the next time auth modals are opened
+            const loginModal = document.getElementById('login-modal');
+            if (loginModal) loginModal.classList.remove('hidden', 'opacity-0', 'scale-95');
         }, 300);
     };
 
@@ -221,7 +241,7 @@ export const initForms = () => {
 
                 if (!error) {
                     showStatusMessage(enrollStatus, '¡Inscripción confirmada! Te hemos enviado un correo.', true);
-                    
+
                     setTimeout(() => {
                         closeEnrollModal();
                         if (enrollStatus) enrollStatus.classList.add('hidden');

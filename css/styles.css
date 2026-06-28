@@ -149,13 +149,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 
 #auth-modals {
-  perspective: 1000px;
+  transition: opacity 0.3s ease-in-out;
 }
 
 #login-modal,
 #register-modal {
   transition: all 0.3s ease-out;
-  transform-style: preserve-3d;
 }
 
 .form-input {
