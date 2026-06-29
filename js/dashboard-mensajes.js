@@ -20,11 +20,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   const modalStatusBadge = document.getElementById('modal-status-badge');
   const modalBody = document.getElementById('modal-message-body');
   const toggleReadBtn = document.getElementById('toggle-read-btn');
-  const replyBtn = document.getElementById('reply-mailto-btn');
+  const showReplyBtn = document.getElementById('show-reply-btn');
   const deleteBtn = document.getElementById('delete-message-btn');
   const unbanBtn = document.getElementById('unban-user-btn');
   const appealActionsContainer = document.getElementById('appeal-actions-container');
   const unbanReasonInput = document.getElementById('unban-reason-input');
+  
+  // Elementos del formulario de respuesta
+  const replyContainer = document.getElementById('reply-container');
+  const replyInput = document.getElementById('reply-message-input');
+  const replyStatus = document.getElementById('reply-status-message');
+  const cancelReplyBtn = document.getElementById('cancel-reply-btn');
+  const sendReplyBtn = document.getElementById('send-reply-btn');
 
   let currentMessageId = null;
 
@@ -43,10 +50,29 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
+    // Buscar fotos de perfil de los usuarios
+    const userIds = [...new Set(data.filter(m => m.user_id).map(m => m.user_id))];
+    let profilesMap = {};
+    
+    if (userIds.length > 0) {
+      const { data: profilesData } = await supabase
+        .from('perfiles')
+        .select('id, foto_perfil')
+        .in('id', userIds);
+        
+      if (profilesData) {
+        profilesMap = profilesData.reduce((acc, p) => {
+          acc[p.id] = p.foto_perfil;
+          return acc;
+        }, {});
+      }
+    }
+
     messages = data.map(msg => ({
       ...msg,
       leido: !!msg.leido,
-      fecha: msg.created_at
+      fecha: msg.created_at,
+      foto_perfil: msg.user_id ? profilesMap[msg.user_id] : null
     }));
 
     renderTable();
@@ -103,14 +129,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       const fontClass = msg.leido ? 'font-normal' : 'font-semibold text-gray-900';
       
       const extracto = msg.mensaje && msg.mensaje.length > 50 ? msg.mensaje.substring(0, 50) + '...' : (msg.mensaje || '');
+      const initial = msg.nombre ? msg.nombre.charAt(0).toUpperCase() : '?';
+      
+      const avatarHTML = msg.foto_perfil
+        ? `<img src="${msg.foto_perfil}" alt="Avatar" class="w-8 h-8 rounded-full object-cover flex-shrink-0 border border-gray-200">`
+        : `<div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs font-bold flex-shrink-0">${initial}</div>`;
 
       return `
-        <tr class="${rowClass} border-b hover:bg-gray-50 transition-colors cursor-pointer message-row" data-id="${msg.id}">
+        <tr class="${rowClass} border-b border-gray-100 hover:bg-gray-50 transition-colors message-row cursor-pointer" data-id="${msg.id}">
           <td class="px-6 py-4">
             <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
-                ${msg.nombre ? msg.nombre.charAt(0).toUpperCase() : '?'}
-              </div>
+              ${avatarHTML}
               <div>
                 <p class="${fontClass}">${msg.nombre}</p>
                 <p class="text-xs text-gray-500">${msg.email}</p>
@@ -148,7 +177,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     currentMessageId = id;
 
-    modalAvatar.textContent = msg.nombre ? msg.nombre.charAt(0).toUpperCase() : '?';
+    if (msg.foto_perfil) {
+      modalAvatar.innerHTML = `<img src="${msg.foto_perfil}" class="w-full h-full object-cover rounded-full">`;
+      modalAvatar.className = "w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 border border-gray-200";
+    } else {
+      modalAvatar.textContent = msg.nombre ? msg.nombre.charAt(0).toUpperCase() : '?';
+      modalAvatar.className = "w-10 h-10 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold text-lg flex-shrink-0";
+    }
+    
     modalName.textContent = msg.nombre;
     modalEmail.textContent = msg.email;
     
@@ -168,8 +204,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
     
-    replyBtn.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${msg.email}&su=Respuesta%20desde%20Apoyo%20Joven`;
-    replyBtn.target = '_blank';
+    // Resetear contenedor de respuesta
+    if (replyContainer) {
+      replyContainer.classList.add('hidden');
+      replyInput.value = '';
+      replyStatus.classList.add('hidden');
+    }
 
     if (!msg.leido) {
       msg.leido = true;
@@ -228,6 +268,79 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
   });
+
+  // ========== LÓGICA DE RESPUESTA ==========
+  if (showReplyBtn) {
+    showReplyBtn.addEventListener('click', () => {
+      if (replyContainer) replyContainer.classList.remove('hidden');
+      if (replyInput) replyInput.focus();
+    });
+  }
+
+  if (cancelReplyBtn) {
+    cancelReplyBtn.addEventListener('click', () => {
+      if (replyContainer) replyContainer.classList.add('hidden');
+      if (replyInput) replyInput.value = '';
+      if (replyStatus) replyStatus.classList.add('hidden');
+    });
+  }
+
+  if (sendReplyBtn) {
+    sendReplyBtn.addEventListener('click', async () => {
+      if (!currentMessageId) return;
+      const msg = messages.find(m => m.id === currentMessageId);
+      if (!msg) return;
+
+      if (!msg.user_id) {
+        replyStatus.textContent = 'Error: Este mensaje fue enviado por un visitante anónimo o antes de la actualización. No se le puede responder por aquí.';
+        replyStatus.className = 'text-sm mb-3 font-medium text-red-600 bg-red-50 p-2 rounded';
+        replyStatus.classList.remove('hidden');
+        return;
+      }
+
+      const replyText = replyInput.value.trim();
+      if (!replyText) {
+        replyStatus.textContent = 'Por favor, escribe una respuesta.';
+        replyStatus.className = 'text-sm mb-3 font-medium text-red-600 bg-red-50 p-2 rounded';
+        replyStatus.classList.remove('hidden');
+        return;
+      }
+
+      sendReplyBtn.disabled = true;
+      sendReplyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+      
+      try {
+        const { error } = await supabase.from('notificaciones').insert({
+          user_id: msg.user_id,
+          titulo: 'Respuesta a tu mensaje de contacto',
+          mensaje: replyText,
+          leida: false
+        });
+
+        if (error) throw error;
+
+        replyStatus.textContent = '¡Respuesta enviada con éxito!';
+        replyStatus.className = 'text-sm mb-3 font-medium text-green-600 bg-green-50 p-2 rounded';
+        replyStatus.classList.remove('hidden');
+        
+        setTimeout(() => {
+          if (replyContainer) replyContainer.classList.add('hidden');
+          if (replyInput) replyInput.value = '';
+          if (replyStatus) replyStatus.classList.add('hidden');
+        }, 2000);
+
+      } catch (err) {
+        console.error('Error enviando respuesta:', err);
+        replyStatus.textContent = 'Error al enviar respuesta.';
+        replyStatus.className = 'text-sm mb-3 font-medium text-red-600 bg-red-50 p-2 rounded';
+        replyStatus.classList.remove('hidden');
+      } finally {
+        sendReplyBtn.disabled = false;
+        sendReplyBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar';
+      }
+    });
+  }
+  // ==========================================
 
   deleteBtn.addEventListener('click', async () => {
     if (currentMessageId && confirm('¿Estás seguro de que deseas eliminar este mensaje?')) {

@@ -143,13 +143,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (estado.toLowerCase() === 'cancelado') estadoClass = "bg-red-100 text-red-700 border-red-200";
                 else if (estado.toLowerCase() === 'en_espera' || estado.toLowerCase() === 'en espera') estadoClass = "bg-yellow-100 text-yellow-700 border-yellow-200";
 
+                const avatarHTML = perfil.foto_perfil
+                    ? `<img src="${perfil.foto_perfil}" alt="Avatar" class="w-8 h-8 rounded-full object-cover border border-gray-200">`
+                    : `<div class="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold text-xs uppercase">${nombreFull.charAt(0)}</div>`;
+
                 return `
                 <tr class="bg-white border-b hover:bg-gray-50 transition-colors">
                     <td class="px-6 py-4 font-medium text-gray-900">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold text-xs uppercase">
-                                ${nombreFull.charAt(0)}
-                            </div>
+                            ${avatarHTML}
                             ${nombreFull}
                         </div>
                     </td>

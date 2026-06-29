@@ -117,6 +117,11 @@ export const initForms = () => {
                 email: finalEmail,
                 mensaje: message
             };
+
+            // Adjuntar user_id si está logueado
+            if (currentUserId) {
+                datosParaEnviar.user_id = currentUserId;
+            }
             const statusDiv = document.getElementById('contact-status');
             showStatusMessage(statusDiv, 'procesando solicitud', true);
 

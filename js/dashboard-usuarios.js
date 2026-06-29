@@ -164,10 +164,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const formattedDate = !isNaN(dateObj.getTime()) ? dateObj.toLocaleDateString('es-ES') : 'N/A';
         const fullName = `${user.nombre || ''} ${user.apellido || ''}`.trim();
 
+        const avatarHTML = user.foto_perfil 
+            ? `<img src="${user.foto_perfil}" alt="Avatar" class="w-8 h-8 rounded-full object-cover border border-gray-200">`
+            : `<div class="w-8 h-8 rounded-full bg-${roleColor}-100 text-${roleColor}-600 flex items-center justify-center font-bold">${initial}</div>`;
+
         tr.innerHTML = `
             <td class="px-6 py-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-${roleColor}-100 text-${roleColor}-600 flex items-center justify-center font-bold">${initial}</div>
+                    ${avatarHTML}
                     <div>
                         <p class="font-semibold text-gray-900 user-name">${fullName}</p>
                         <p class="text-xs text-gray-500 user-email">${user.correo || 'Sin correo'}</p>
