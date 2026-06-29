@@ -185,6 +185,33 @@
         </div>
       </div>
 
+      <!-- Global Notifications Form Row -->
+      <div class="mb-6">
+        <div class="bg-gradient-to-br from-primary-50 to-primary-100/50 rounded-xl p-6 border border-primary-100 dashboard-card">
+          <h3 class="text-lg font-bold text-primary-800 mb-1 flex items-center gap-2"><i class="fas fa-bullhorn text-primary-500"></i> Enviar Aviso Global</h3>
+          <p class="text-sm text-gray-600 mb-4">Envía una notificación al perfil de todos los usuarios registrados.</p>
+          
+          <form id="global-notification-form" class="space-y-4">
+            <div>
+              <label for="global-title" class="block text-sm font-medium text-gray-700 mb-1">Título del Aviso</label>
+              <input type="text" id="global-title" required placeholder="Ej: Suspensión de actividades por lluvia" class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 outline-none">
+            </div>
+            <div>
+              <label for="global-message" class="block text-sm font-medium text-gray-700 mb-1">Mensaje (Puedes incluir links, ej: https://...)</label>
+              <textarea id="global-message" required rows="3" placeholder="Escribe el cuerpo del mensaje aquí..." class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 outline-none resize-none"></textarea>
+            </div>
+            
+            <div id="global-status" class="hidden p-3 rounded-lg text-sm mb-2 font-medium"></div>
+            
+            <div class="flex justify-end">
+              <button type="submit" id="global-submit-btn" class="px-6 py-2.5 bg-primary-500 text-white font-bold rounded-lg hover:bg-primary-600 shadow-md transition-colors flex items-center gap-2">
+                <i class="fas fa-paper-plane"></i> Enviar a Todos
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- Row 2: Demographics Graph & Upcoming Events -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -292,11 +319,8 @@
     </div>
   </main>
 
-  <script type="module" src="../js/dashboard.js?v=3"></script>
+  <script type="module" src="../js/dashboard.js?v=2"></script>
+  <script type="module" src="../js/dashboard-notificaciones.js?v=1"></script>
 </body>
-
-</html>
-
-
 
 

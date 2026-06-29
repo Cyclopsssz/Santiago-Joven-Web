@@ -818,18 +818,53 @@ export const initAuth = () => {
 
             if (!data || data.length === 0) {
                 notificationsList.innerHTML = '<div class="text-center py-8 text-gray-500">No tienes notificaciones.</div>';
+                const clearBtn = document.getElementById('clear-notifications-btn');
+                if (clearBtn) clearBtn.classList.add('hidden');
                 return;
             }
 
-            notificationsList.innerHTML = data.map(n => `
-                <div class="p-4 rounded-xl border ${n.leida ? 'bg-white border-gray-100' : 'bg-primary-50 border-primary-100 shadow-sm'} transition-colors">
-                    <div class="flex justify-between items-start mb-1">
+            notificationsList.innerHTML = data.map(n => {
+                // Función simple para convertir URLs en enlaces clickeables
+                const formatLinks = (text) => {
+                    const urlRegex = /(https?:\/\/[^\s]+)/g;
+                    return text.replace(urlRegex, url => `<a href="${url}" target="_blank" class="text-primary-500 hover:text-primary-600 underline">${url}</a>`);
+                };
+                
+                return `
+                <div class="p-4 rounded-xl border ${n.leida ? 'bg-white border-gray-100' : 'bg-primary-50 border-primary-100 shadow-sm'} transition-colors relative group">
+                    <button class="delete-notification-btn absolute top-3 right-3 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100" data-id="${n.id}" title="Eliminar notificación">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <div class="flex justify-between items-start mb-1 pr-6">
                         <h4 class="font-semibold ${n.leida ? 'text-gray-700' : 'text-primary-700'}">${n.titulo}</h4>
-                        <span class="text-[10px] font-medium text-gray-400">${new Date(n.created_at).toLocaleDateString()}</span>
+                        <span class="text-[10px] font-medium text-gray-400 whitespace-nowrap ml-2">${new Date(n.created_at).toLocaleDateString()}</span>
                     </div>
-                    <p class="text-sm text-gray-600">${n.mensaje}</p>
+                    <p class="text-sm text-gray-600 pr-4">${formatLinks(n.mensaje)}</p>
                 </div>
-            `).join('');
+                `;
+            }).join('');
+
+            // Mostrar el botón de vaciar bandeja si hay notificaciones
+            const clearBtn = document.getElementById('clear-notifications-btn');
+            if (clearBtn) clearBtn.classList.remove('hidden');
+
+            // Añadir eventos a los botones de borrar individuales
+            document.querySelectorAll('.delete-notification-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const notifId = e.currentTarget.dataset.id;
+                    const el = e.currentTarget.closest('div.p-4');
+                    el.style.opacity = '0.5'; // Estado de carga visual
+                    try {
+                        const { error } = await supabase.from('notificaciones').delete().eq('id', notifId).eq('user_id', currentUserId);
+                        if (error) throw error;
+                        await loadNotifications(); // Recargar lista
+                    } catch (err) {
+                        console.error('Error al borrar notificación:', err);
+                        el.style.opacity = '1';
+                        alert('No se pudo borrar la notificación.');
+                    }
+                });
+            });
 
             const unreadIds = data.filter(n => !n.leida).map(n => n.id);
             if (unreadIds.length > 0) {
@@ -841,6 +876,29 @@ export const initAuth = () => {
             notificationsList.innerHTML = '<div class="text-center py-8 text-red-500">Error al cargar notificaciones.</div>';
         }
     };
+
+    // Evento para el botón de Vaciar Bandeja
+    const clearBtn = document.getElementById('clear-notifications-btn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', async () => {
+            if (!currentUserId) return;
+            if (!confirm('¿Estás seguro de que quieres borrar TODAS tus notificaciones?')) return;
+            
+            clearBtn.disabled = true;
+            clearBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Vaciando...';
+            try {
+                const { error } = await supabase.from('notificaciones').delete().eq('user_id', currentUserId);
+                if (error) throw error;
+                await loadNotifications();
+            } catch (err) {
+                console.error('Error al vaciar bandeja:', err);
+                alert('No se pudo vaciar la bandeja.');
+            } finally {
+                clearBtn.disabled = false;
+                clearBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Vaciar bandeja';
+            }
+        });
+    }
 
     if (openNotificationsBtn) {
         openNotificationsBtn.addEventListener('click', (e) => {

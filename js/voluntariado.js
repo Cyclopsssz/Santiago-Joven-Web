@@ -203,6 +203,56 @@ function initVoluntariado() {
         if (btn) openModal(btn.dataset.id);
     });
 
+    // Variables para el modal secundario de inscripción
+    const authBackdrop = document.getElementById('auth-backdrop');
+    const enrollModal = document.getElementById('enroll-modal');
+    const enrollCourseName = document.getElementById('enroll-course-name');
+    const confirmEnrollBtn = document.getElementById('confirm-enroll-btn');
+    const closeEnrollBtn = document.getElementById('close-enroll-btn');
+    const enrollStatus = document.getElementById('enroll-status');
+
+    function openEnrollModal(eventName) {
+        if (enrollCourseName) enrollCourseName.textContent = eventName;
+        if (enrollStatus) {
+            enrollStatus.classList.add('hidden');
+            enrollStatus.textContent = '';
+        }
+        if (confirmEnrollBtn) {
+            confirmEnrollBtn.disabled = false;
+            confirmEnrollBtn.textContent = 'Confirmar Inscripción';
+        }
+        
+        if (authBackdrop) authBackdrop.classList.remove('hidden');
+        if (enrollModal) {
+            enrollModal.classList.remove('hidden');
+            setTimeout(() => {
+                enrollModal.classList.remove('scale-95', 'opacity-0');
+                enrollModal.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+    }
+
+    function closeEnrollModal() {
+        if (enrollModal) {
+            enrollModal.classList.remove('scale-100', 'opacity-100');
+            enrollModal.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                enrollModal.classList.add('hidden');
+                if (authBackdrop) authBackdrop.classList.add('hidden');
+            }, 300);
+        }
+    }
+
+    if (closeEnrollBtn) {
+        closeEnrollBtn.addEventListener('click', closeEnrollModal);
+    }
+    
+    if (authBackdrop) {
+        authBackdrop.addEventListener('click', (e) => {
+            if (e.target === authBackdrop) closeEnrollModal();
+        });
+    }
+
     // 5. Enroll / Unenroll Action
     if (inscribirmeBtn) {
         inscribirmeBtn.addEventListener('click', async () => {
@@ -210,12 +260,11 @@ function initVoluntariado() {
             const eventoId = currentSelectedEvento.id;
             const estaInscrito = misInscripciones.includes(eventoId);
 
-            inscribirmeBtn.disabled = true;
-            inscribirmeBtn.textContent = 'Procesando...';
-
-            try {
-                if (estaInscrito) {
-                    // Cancelar
+            if (estaInscrito) {
+                // Cancelar (se mantiene simple)
+                inscribirmeBtn.disabled = true;
+                inscribirmeBtn.textContent = 'Cancelando...';
+                try {
                     await supabase
                         .from('inscripciones_voluntariado')
                         .delete()
@@ -224,24 +273,71 @@ function initVoluntariado() {
                     
                     misInscripciones = misInscripciones.filter(id => id !== eventoId);
                     alert('Tu inscripción ha sido cancelada.');
-                } else {
-                    // Inscribir
-                    await supabase
-                        .from('inscripciones_voluntariado')
-                        .insert([{ evento_id: eventoId, user_id: currentUser.id }]);
-                    
-                    misInscripciones.push(eventoId);
-                    
-                    // Bonito mensaje de éxito
-                    alert('¡Éxito! Te has inscrito correctamente a esta actividad. ¡Gracias por participar!');
+                    closeModal();
+                    renderGrid();
+                } catch(err) {
+                    console.error(err);
+                    alert('Hubo un error al cancelar.');
+                } finally {
+                    inscribirmeBtn.disabled = false;
                 }
-                closeModal();
-                renderGrid();
+            } else {
+                // Abrir modal de confirmación en vez de inscribir de inmediato
+                openEnrollModal(currentSelectedEvento.titulo);
+            }
+        });
+    }
+
+    if (confirmEnrollBtn) {
+        confirmEnrollBtn.addEventListener('click', async () => {
+            if (!currentSelectedEvento || !currentUser) return;
+            
+            confirmEnrollBtn.disabled = true;
+            confirmEnrollBtn.textContent = 'Procesando...';
+            const eventoId = currentSelectedEvento.id;
+
+            try {
+                const { error } = await supabase
+                    .from('inscripciones_voluntariado')
+                    .insert([{ evento_id: eventoId, user_id: currentUser.id }]);
+                
+                if (error) throw error;
+
+                misInscripciones.push(eventoId);
+                
+                // Mostrar éxito en el modal
+                if (enrollStatus) {
+                    enrollStatus.classList.remove('hidden', 'bg-red-50', 'text-red-700');
+                    enrollStatus.classList.add('bg-green-50', 'text-green-700');
+                    enrollStatus.textContent = '¡Inscripción confirmada! Te hemos enviado una notificación al perfil.';
+                }
+                
+                // Disparar evento para actualizar el modal principal
+                window.dispatchEvent(new CustomEvent('enrollment-success'));
+
+                // Crear notificación
+                await supabase.from('notificaciones').insert([{
+                    user_id: currentUser.id,
+                    titulo: 'Inscripción Exitosa',
+                    mensaje: `Te has inscrito correctamente a: ${currentSelectedEvento.titulo}. ¡Te esperamos!`,
+                    leida: false
+                }]);
+
+                setTimeout(() => {
+                    closeEnrollModal();
+                    closeModal(); // Cerrar también el modal de detalle
+                    renderGrid();
+                }, 2000);
+
             } catch(err) {
                 console.error(err);
-                alert('Hubo un error al procesar tu solicitud. Intenta nuevamente.');
-            } finally {
-                inscribirmeBtn.disabled = false;
+                if (enrollStatus) {
+                    enrollStatus.classList.remove('hidden', 'bg-green-50', 'text-green-700');
+                    enrollStatus.classList.add('bg-red-50', 'text-red-700');
+                    enrollStatus.textContent = 'Error al inscribir: ' + err.message;
+                }
+                confirmEnrollBtn.disabled = false;
+                confirmEnrollBtn.textContent = 'Reintentar';
             }
         });
     }

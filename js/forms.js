@@ -246,7 +246,19 @@ export const initForms = () => {
                 }
 
                 if (!error) {
-                    showStatusMessage(enrollStatus, '¡Inscripción confirmada! Te hemos enviado un correo.', true);
+                    showStatusMessage(enrollStatus, '¡Inscripción confirmada! Te hemos enviado una notificación al perfil.', true);
+                    
+                    // Notificar a otros scripts que la inscripción fue exitosa
+                    window.dispatchEvent(new CustomEvent('enrollment-success'));
+                    
+                    // Crear la notificación en la base de datos
+                    const tituloEvento = enrollCourseName ? enrollCourseName.textContent : 'un evento';
+                    await supabase.from('notificaciones').insert([{
+                        user_id: currentUserId,
+                        titulo: 'Inscripción Exitosa',
+                        mensaje: `Te has inscrito correctamente a: ${tituloEvento}. ¡Te esperamos!`,
+                        leida: false
+                    }]);
 
                     setTimeout(() => {
                         closeEnrollModal();

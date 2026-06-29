@@ -116,6 +116,25 @@
     </div>
   </div>
 
+  <!-- Backdrop for Enroll Modal -->
+  <div id="auth-backdrop" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+    <!-- Modal de Inscripción -->
+    <div id="enroll-modal" class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md mx-auto transform transition-all duration-300 scale-95 opacity-0 hidden my-auto click-stop-propagation relative">
+      <h2 class="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
+        Inscripción
+      </h2>
+      <div class="text-center space-y-4">
+        <p class="text-gray-600 text-lg">¿Deseas confirmar tu inscripción a <strong id="enroll-course-name" class="text-gray-800"></strong>?</p>
+        <p class="text-sm text-gray-500 mb-6">Enviaremos una notificación a tu perfil.</p>
+        <div id="enroll-status" class="hidden p-3 rounded-lg text-sm mb-4"></div>
+        <div class="flex flex-col space-y-3">
+          <button id="confirm-enroll-btn" class="px-6 py-3 bg-primary-500 text-white font-bold rounded-lg hover:bg-primary-600 w-full text-base">Confirmar Inscripción</button>
+          <button id="close-enroll-btn" class="px-6 py-3 bg-white border border-primary-500 text-primary-500 font-bold rounded-lg hover:bg-primary-50 w-full text-base">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="../js/voluntariado.js?v=2"></script>
 </body>
 </html>

@@ -202,8 +202,8 @@ export const initCalendar = async () => {
 
     await loadEvents();
 
-    // Escuchar el evento de inicio de sesión para actualizar el modal si está abierto
-    window.addEventListener('auth-status-changed', () => {
+    // Escuchar el evento de inicio de sesión o inscripción para actualizar el modal si está abierto
+    const reevaluarModal = () => {
         const modal = document.getElementById('public-event-modal');
         if (modal && !modal.classList.contains('hidden')) {
             const btnInscribirse = document.getElementById('btn-inscribirse-modal');
@@ -213,7 +213,10 @@ export const initCalendar = async () => {
                 detailsBtn.click(); // Re-ejecutar la lógica para recalcular el estado
             }
         }
-    });
+    };
+
+    window.addEventListener('auth-status-changed', reevaluarModal);
+    window.addEventListener('enrollment-success', reevaluarModal);
 
     // filtrado de eventos en calendario
     filterButtons.forEach(btn => {
