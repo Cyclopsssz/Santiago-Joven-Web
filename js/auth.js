@@ -59,6 +59,8 @@ export const closeAuthModal = () => {
         if (notificationsModal) notificationsModal.classList.add('hidden', 'opacity-0', 'scale-95');
         const enrollModal = document.getElementById('enroll-modal');
         if (enrollModal) enrollModal.classList.add('hidden', 'opacity-0', 'scale-95');
+        const forgotModal = document.getElementById('forgot-password-modal');
+        if (forgotModal) forgotModal.classList.add('hidden', 'opacity-0', 'scale-95');
         // Show login by default
         if (loginModal) loginModal.classList.remove('hidden', 'opacity-0', 'scale-95');
         currentModal = loginModal;
@@ -430,10 +432,12 @@ export const initAuth = () => {
             showStatusMessage(statusDiv, 'procesando registro', true);
 
             try {
+                const redirectUrl = `${window.location.origin}/html/index.html`;
                 const { data, error } = await supabase.auth.signUp({
                     email: datos.Email,
                     password: datos.Password,
                     options: {
+                        emailRedirectTo: redirectUrl,
                         data: {
                             rut: datos.Rut,
                             nombre: datos.Nombre,
@@ -457,13 +461,13 @@ export const initAuth = () => {
                         estado: 'Activo'
                     }).eq('id', data.user.id);
 
-                    showStatusMessage(statusDiv, 'registro exitoso', true);
+                    showStatusMessage(statusDiv, '¡Registro exitoso! Revisa tu bandeja de entrada o spam para confirmar tu cuenta.', true);
                     registerForm.reset();
 
                     setTimeout(() => {
                         showLoginModal();
                         statusDiv.classList.add('hidden');
-                    }, 2000);
+                    }, 4000);
                 } else {
                     showStatusMessage(statusDiv, 'error: ' + error.message, false);
                 }
@@ -908,9 +912,87 @@ export const initAuth = () => {
         });
     }
 
-    // Revisar badge de notificaciones al cargar si el usuario ya est\u00e1 logeado
+    // Revisar badge de notificaciones al cargar si el usuario ya está logeado
     supabase.auth.getUser().then(({ data }) => {
         if (data?.user) checkNotificationBadge();
     });
+
+    // ============================
+    // PANEL: RECUPERAR CONTRASEÑA
+    // ============================
+    const forgotPasswordBtn = document.getElementById('forgot-password-btn');
+    const forgotPasswordModal = document.getElementById('forgot-password-modal');
+    const forgotPasswordForm = document.getElementById('forgot-password-form');
+    const backToLoginBtn = document.getElementById('back-to-login-btn');
+
+    const showForgotPasswordModal = (e) => {
+        if (e) e.preventDefault();
+        currentModal = forgotPasswordModal;
+        if (loginModal) loginModal.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            if (loginModal) loginModal.classList.add('hidden');
+            if (forgotPasswordModal) forgotPasswordModal.classList.remove('hidden');
+            setTimeout(() => {
+                if (forgotPasswordModal) forgotPasswordModal.classList.remove('scale-95', 'opacity-0');
+            }, 50);
+        }, 300);
+    };
+
+    const backToLogin = (e) => {
+        if (e) e.preventDefault();
+        currentModal = loginModal;
+        if (forgotPasswordModal) forgotPasswordModal.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            if (forgotPasswordModal) forgotPasswordModal.classList.add('hidden');
+            if (loginModal) loginModal.classList.remove('hidden');
+            setTimeout(() => {
+                if (loginModal) loginModal.classList.remove('scale-95', 'opacity-0');
+            }, 50);
+        }, 300);
+    };
+
+    if (forgotPasswordBtn) forgotPasswordBtn.addEventListener('click', showForgotPasswordModal);
+    if (backToLoginBtn) backToLoginBtn.addEventListener('click', backToLogin);
+
+    if (forgotPasswordForm) {
+        forgotPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('forgot-email').value;
+            const statusDiv = document.getElementById('forgot-status');
+            const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enviando...';
+            showStatusMessage(statusDiv, 'Enviando enlace...', true);
+
+            try {
+                const redirectUrl = `${window.location.origin}/html/recuperar.html`;
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: redirectUrl
+                });
+
+                if (error) throw error;
+
+                showStatusMessage(statusDiv, '¡Enlace enviado! Revisa tu bandeja de entrada o spam.', true);
+                forgotPasswordForm.reset();
+
+                setTimeout(() => {
+                    backToLogin();
+                    statusDiv.classList.add('hidden');
+                }, 5000);
+            } catch (err) {
+                console.error('Error al enviar enlace de recuperación:', err);
+                showStatusMessage(statusDiv, 'Error: ' + (err.message || 'No se pudo enviar el enlace'), false);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Enviar enlace de recuperación';
+            }
+        });
+    }
+
+    // Incluir forgot-password-modal en el reset de closeAuthModal
+    const originalCloseAuthModal = closeAuthModal;
+    // El modal ya se maneja por el closeAuthModal existente gracias a que
+    // reseteamos todos los modales ocultos al cerrar.
 
 };

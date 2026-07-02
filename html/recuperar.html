@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restablecer Contraseña - Santiago Joven</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'sans': ['Poppins', 'sans-serif'],
+          },
+          colors: {
+            'primary': {
+              '500': '#0ea5e9',
+              '600': '#0284c7',
+            },
+            'secondary': {
+              '500': '#10b981',
+              '600': '#059669',
+            },
+            'accent': {
+              '500': '#f97316',
+              '600': '#ea580c',
+            },
+            'light-bg': '#f8fafc',
+          }
+        }
+      }
+    }
+  </script>
+  <link href="../css/styles.css" rel="stylesheet">
+</head>
+
+<body class="bg-gradient-to-br from-primary-500 to-secondary-500 min-h-screen flex items-center justify-center p-6 font-sans antialiased">
+
+  <div class="card w-full max-w-md mx-auto">
+    <!-- Logo / Título -->
+    <div class="text-center mb-8">
+      <a href="index.html" class="text-3xl font-bold text-primary-500 inline-block mb-2">Apoyo Joven</a>
+      <h1 class="text-2xl font-bold text-gray-800">Restablecer Contraseña</h1>
+      <p class="text-gray-500 text-sm mt-2">Escribe tu nueva contraseña para recuperar el acceso a tu cuenta.</p>
+    </div>
+
+    <!-- Formulario -->
+    <form id="reset-password-form" class="space-y-5">
+      <div id="reset-status" class="hidden p-3 rounded-lg text-sm"></div>
+
+      <div>
+        <label for="new-password" class="block text-sm font-medium text-gray-700 mb-1">Nueva Contraseña</label>
+        <input type="password" id="new-password" class="form-input" placeholder="••••••••" required minlength="6">
+      </div>
+
+      <div>
+        <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirmar Contraseña</label>
+        <input type="password" id="confirm-password" class="form-input" placeholder="••••••••" required minlength="6">
+      </div>
+
+      <button type="submit" id="reset-submit-btn" class="btn btn-primary w-full py-3 text-base">
+        <i class="fas fa-key mr-2"></i>Guardar Nueva Contraseña
+      </button>
+    </form>
+
+    <!-- Enlace de vuelta -->
+    <div class="text-center mt-6">
+      <a href="index.html" class="text-sm text-primary-500 hover:underline">
+        <i class="fas fa-arrow-left mr-1"></i>Volver al inicio
+      </a>
+    </div>
+  </div>
+
+  <script type="module" src="../js/recuperar.js"></script>
+</body>
+
+</html>
